@@ -92,17 +92,13 @@ function renderBookshelf() {
 // --- Continue Listening Card ---
 function renderContinueCard() {
   const card = document.getElementById('continue-card');
-  const { bookId, trackIdx } = getLastPlayed();
-  const book = bookId ? books.find(b => b.id === bookId) : null;
+  let { bookId, trackIdx } = getLastPlayed();
+  let book = bookId ? books.find(b => b.id === bookId) : null;
 
+  // Default to 三字经 if no history
   if (!book) {
-    card.innerHTML = `
-      <div class="continue-empty">
-        <i class="ri-headphone-line" style="font-size:36px;color:var(--wood-light);"></i>
-        <div class="continue-label">选一本书开始磨耳朵</div>
-      </div>`;
-    card.onclick = null;
-    return;
+    book = books.find(b => b.id === 'sanzijing') || books[0];
+    trackIdx = 0;
   }
 
   const gi = books.indexOf(book);
