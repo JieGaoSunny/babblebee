@@ -447,16 +447,17 @@ body {
   .header h1 { font-size: 20px; letter-spacing: 3px; }
   .header-en { font-size: 13px; }
   .sidebar { padding: 10px 14px; }
-  .continue-card { padding: 12px; gap: 12px; }
-  .continue-cover { width: 48px; height: 66px; }
+  .continue-card { padding: 12px; gap: 10px; overflow: visible; }
+  .continue-cover { width: 48px; height: 66px; flex-shrink: 0; }
   .continue-cover h3 { font-size: 12px; letter-spacing: 2px; }
-  .continue-title { font-size: 13px; }
+  .continue-info { min-width: 0; }
+  .continue-title { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .continue-label { font-size: 11px; }
   .continue-play { width: 40px; height: 40px; font-size: 20px; flex-shrink: 0; }
   .bookshelf-area { padding: 14px; }
   .shelf-board { height: 22px; margin: 0 -14px; }
-  .shelf-books { gap: 12px; flex-wrap: nowrap; overflow-x: auto; padding-right: 14px; }
-  .book-cover { width: 72px; height: 100px; }
+  .shelf-books { gap: 12px; flex-wrap: nowrap; overflow-x: auto; padding-right: 40px; -webkit-overflow-scrolling: touch; }
+  .book-cover { width: 72px; height: 100px; flex-shrink: 0; }
   .book-cover h3 { font-size: 14px; letter-spacing: 3px; }
   .shelf-label { font-size: 13px; letter-spacing: 3px; }
   /* mini player responsive */
