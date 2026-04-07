@@ -66,6 +66,7 @@ body {
   display: grid;
   grid-template-columns: 300px 1fr;
   min-height: calc(100vh - 100px);
+  overflow: hidden;
 }
 
 /* ===== SIDEBAR — Continue Listening ===== */
@@ -73,6 +74,7 @@ body {
   padding: 28px 20px;
   border-right: 1px solid rgba(139,90,43,0.1);
   background: rgba(255,255,255,0.3);
+  overflow: hidden;
 }
 
 .continue-card {
@@ -87,6 +89,7 @@ body {
   border: 1px solid rgba(212,175,55,0.2);
   margin-bottom: 24px;
   transition: all 0.2s;
+  max-width: 100%; overflow: hidden;
 }
 .continue-card:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(101,67,33,0.35); }
 
@@ -423,7 +426,8 @@ body {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .main-content { grid-template-columns: 1fr; }
+  .main-content { grid-template-columns: 1fr; overflow: hidden; }
+  .sidebar, .bookshelf-area { min-width: 0; max-width: 100%; }
   .sidebar {
     border-right: none; border-bottom: 1px solid rgba(139,90,43,0.1);
     padding: 16px 20px;
@@ -447,10 +451,10 @@ body {
   .header h1 { font-size: 20px; letter-spacing: 3px; }
   .header-en { font-size: 13px; }
   .sidebar { padding: 10px 14px; }
-  .continue-card { padding: 12px; gap: 10px; overflow: visible; }
+  .continue-card { padding: 12px; gap: 10px; max-width: 100%; }
   .continue-cover { width: 48px; height: 66px; flex-shrink: 0; }
   .continue-cover h3 { font-size: 12px; letter-spacing: 2px; }
-  .continue-info { min-width: 0; }
+  .continue-info { min-width: 0; flex: 1; }
   .continue-title { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .continue-label { font-size: 11px; }
   .continue-play { width: 40px; height: 40px; font-size: 20px; flex-shrink: 0; }
