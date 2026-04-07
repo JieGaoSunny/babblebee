@@ -40,6 +40,7 @@ body {
   box-shadow: 0 0 60px rgba(0,0,0,0.1);
   position: relative;
   padding-bottom: 160px;
+  overflow: hidden;
 }
 
 /* ===== HEADER ===== */
@@ -53,8 +54,8 @@ body {
 }
 .header-left { display: flex; align-items: center; gap: 12px; }
 .topbar-logo { width: 32px; height: 32px; border-radius: 8px; }
-.header h1 { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: 6px; }
-.header-en { font-family: 'Italiana', serif; font-size: 16px; color: var(--ink-light); letter-spacing: 2px; align-self: flex-end; margin-bottom: 2px; }
+.header h1 { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: 6px; line-height: 1; }
+.header-en { font-family: 'Italiana', serif; font-size: 16px; color: var(--ink-light); letter-spacing: 2px; line-height: 1; }
 .header-actions { display: flex; gap: 20px; }
 .header-actions i { font-size: 24px; color: var(--ink-light); cursor: pointer; transition: color 0.2s; }
 .header-actions i:hover { color: var(--gold); }
@@ -340,6 +341,38 @@ body {
 .page.active { display: block; }
 
 .spacer { height: 40px; }
+
+/* ===== SHELF EXPAND (collapsible track list on bookshelf) ===== */
+.shelf-expand-btn {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-size: 12px; color: var(--ink-light); cursor: pointer;
+  padding: 6px 0 12px; letter-spacing: 2px; opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.shelf-expand-btn:hover { opacity: 1; color: var(--gold); }
+.shelf-expand-btn i { font-size: 16px; }
+
+.shelf-expand {
+  padding: 0 4px 16px; max-height: 400px; overflow-y: auto;
+  scrollbar-width: thin;
+}
+.shelf-book-tracks { margin-bottom: 12px; }
+.shelf-book-name {
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  letter-spacing: 3px; margin-bottom: 6px; padding-left: 4px;
+}
+.shelf-track-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.shelf-track-chip {
+  font-size: 11px; color: var(--ink-light);
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(139,90,43,0.12);
+  border-radius: 8px; padding: 4px 10px; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+  max-width: 180px; overflow: hidden; text-overflow: ellipsis;
+}
+.shelf-track-chip:hover {
+  background: var(--gold); color: var(--ink);
+  border-color: var(--gold);
+}
 
 /* ===== BOTTOM NAV ===== */
 .bottom-nav {

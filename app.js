@@ -74,7 +74,7 @@ function renderBookshelf() {
     catMap[b.category].push({ book: b, globalIdx: i });
   });
 
-  document.getElementById('bookshelf-area').innerHTML = catOrder.map(cat => `
+  document.getElementById('bookshelf-area').innerHTML = catOrder.map((cat, ci) => `
     <div class="shelf">
       <div class="shelf-label">${cat}</div>
       <div class="shelf-books">
@@ -84,9 +84,43 @@ function renderBookshelf() {
           </a>
         `).join('')}
       </div>
+      <div class="shelf-expand-btn" onclick="toggleShelfExpand('shelf-expand-${ci}', this)">
+        <i class="ri-arrow-down-s-line"></i> <span>展开目录</span>
+      </div>
+      <div class="shelf-expand" id="shelf-expand-${ci}" style="display:none">
+        ${catMap[cat].map(({ book: b, globalIdx: gi }) => `
+          <div class="shelf-book-tracks">
+            <div class="shelf-book-name">${b.title}</div>
+            <div class="shelf-track-list">
+              ${b.tracks.map((t, ti) => {
+                const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
+                return `<span class="shelf-track-chip" onclick="playFromShelf('${b.id}',${ti})">${name}</span>`;
+              }).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
       <div class="shelf-board"></div>
     </div>
   `).join('');
+}
+
+function toggleShelfExpand(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const showing = el.style.display !== 'none';
+  el.style.display = showing ? 'none' : 'block';
+  btn.querySelector('span').textContent = showing ? '展开目录' : '收起目录';
+  btn.querySelector('i').className = showing ? 'ri-arrow-down-s-line' : 'ri-arrow-up-s-line';
+}
+
+function playFromShelf(bookId, trackIdx) {
+  const book = books.find(b => b.id === bookId);
+  if (!book) return;
+  currentBook = book;
+  currentTrackIdx = trackIdx;
+  location.hash = 'book/' + book.id;
+  setTimeout(() => playTrack(trackIdx), 300);
 }
 
 // --- Continue Listening Card ---
@@ -153,7 +187,7 @@ function showBook(book) {
     <button class="action-btn action-btn-primary" onclick="playTrack(0)">
       <i class="ri-play-circle-fill"></i> <span>全部播放</span>
     </button>
-    ${book.pdf ? `<button class="action-btn action-btn-ghost" onclick="togglePdf()"><i class="ri-book-open-line"></i> 原文</button>` : ''}
+    ${book.pdf ? `<button class="action-btn action-btn-ghost" onclick="openPdf()"><i class="ri-book-open-line"></i> 原文</button>` : ''}
   `;
 
   document.getElementById('detail-tracks').innerHTML = `
@@ -171,13 +205,13 @@ function showBook(book) {
     }).join('')
   }</ul></div>`;
 
-  document.getElementById('book-pdf').innerHTML = book.pdf
-    ? `<div id="pdf-container" style="display:none"><iframe src="${TEXT_BASE}${encodeURIComponent(book.pdf)}"></iframe></div>` : '';
+  document.getElementById('book-pdf').innerHTML = '';
 }
 
-function togglePdf() {
-  const c = document.getElementById('pdf-container');
-  if (c) c.style.display = c.style.display === 'none' ? 'block' : 'none';
+// Open PDF in new tab (more reliable than iframe)
+function openPdf() {
+  if (!currentBook || !currentBook.pdf) return;
+  window.open(TEXT_BASE + encodeURIComponent(currentBook.pdf), '_blank');
 }
 
 function goHome() {
