@@ -74,7 +74,9 @@ function renderBookshelf() {
     catMap[b.category].push({ book: b, globalIdx: i });
   });
 
-  document.getElementById('bookshelf-area').innerHTML = catOrder.map((cat, ci) => `
+  document.getElementById('bookshelf-area').innerHTML = catOrder.map((cat, ci) => {
+    const isEnglish = cat === '英文';
+    return `
     <div class="shelf">
       <div class="shelf-label">${cat}</div>
       <div class="shelf-books">
@@ -85,9 +87,9 @@ function renderBookshelf() {
         `).join('')}
       </div>
       <div class="shelf-expand-btn" onclick="toggleShelfExpand('shelf-expand-${ci}', this)">
-        <i class="ri-arrow-down-s-line"></i> <span>展开目录</span>
+        <i class="${isEnglish ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'}"></i> <span>${isEnglish ? '收起目录' : '展开目录'}</span>
       </div>
-      <div class="shelf-expand" id="shelf-expand-${ci}" style="display:none">
+      <div class="shelf-expand" id="shelf-expand-${ci}" style="${isEnglish ? '' : 'display:none'}">
         ${catMap[cat].map(({ book: b, globalIdx: gi }) => `
           <div class="shelf-book-tracks">
             <div class="shelf-book-name">${b.title}</div>
@@ -102,7 +104,7 @@ function renderBookshelf() {
       </div>
       <div class="shelf-board"></div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 function toggleShelfExpand(id, btn) {
@@ -208,10 +210,17 @@ function showBook(book) {
   document.getElementById('book-pdf').innerHTML = '';
 }
 
-// Open PDF in new tab (more reliable than iframe)
+// Open PDF via hidden link (avoids popup blockers)
 function openPdf() {
   if (!currentBook || !currentBook.pdf) return;
-  window.open(TEXT_BASE + encodeURIComponent(currentBook.pdf), '_blank');
+  const url = TEXT_BASE + encodeURIComponent(currentBook.pdf);
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 function goHome() {
