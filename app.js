@@ -212,7 +212,7 @@ function playTrack(idx) {
   if (item) { item.classList.add('playing'); item.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
   
   if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({ title: name, artist: 'BabbleBee 巴波蜂', album: currentBook.title });
+    navigator.mediaSession.metadata = new MediaMetadata({ title: name, artist: 'BabbleBee 古文磨耳朵', album: currentBook.title });
     navigator.mediaSession.setActionHandler('previoustrack', playerPrev);
     navigator.mediaSession.setActionHandler('nexttrack', playerNext);
   }
