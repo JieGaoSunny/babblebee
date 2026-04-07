@@ -15,15 +15,26 @@
   <!-- ===== HOME PAGE ===== -->
   <main id="page-home" class="page active">
     <div class="topbar">
-      <img src="logo.png" alt="BabbleBee" class="topbar-logo">
-      <span class="topbar-title">BabbleBee</span>
-      <span class="topbar-sub">古文磨耳朵</span>
+      <div class="topbar-left">
+        <img src="logo.png" alt="BabbleBee" class="topbar-logo">
+        <span class="topbar-title">BabbleBee</span>
+        <span class="topbar-sub">古文磨耳朵</span>
+      </div>
     </div>
-    <div class="banner-wrap">
-      <div class="banner-scroll" id="banner-scroll"></div>
+    <div class="main-content">
+      <aside class="sidebar" id="sidebar">
+        <div class="continue-card sidebar-hidden" id="continue-card" onclick="resumePlay()">
+          <div class="continue-cover" id="continue-cover"></div>
+          <div class="continue-info">
+            <div class="continue-label">继续收听</div>
+            <div class="continue-title" id="continue-title"></div>
+            <div class="continue-sub" id="continue-sub"></div>
+          </div>
+          <div class="continue-play"><i class="ri-play-fill"></i></div>
+        </div>
+      </aside>
+      <div class="bookshelf-area" id="bookshelf-area"></div>
     </div>
-    <div id="tabs" class="tabs"></div>
-    <div id="book-list" class="book-list"></div>
   </main>
 
   <!-- ===== BOOK DETAIL PAGE ===== -->

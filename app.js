@@ -1,4 +1,4 @@
-/* BabbleBee 古文磨耳朵 — Classical Parchment Style */
+/* BabbleBee 古文磨耳朵 — Classical Bookshelf + Player */
 
 const AUDIO_BASE = 'https://jiettsstorage.blob.core.windows.net/babblebee/audio/';
 const TEXT_BASE = 'https://jiettsstorage.blob.core.windows.net/babblebee/texts/';
@@ -7,20 +7,18 @@ let books = [];
 let currentBook = null;
 let currentTrackIdx = 0;
 let loopMode = 'single';
-let activeTab = '全部';
 let vinylOpen = false;
 const audio = document.getElementById('audio');
 
-const COVER_TOTAL = 12;
-function getCoverClass(idx) { return 'cv-' + ((idx % COVER_TOTAL) + 1); }
+// Book color classes for shelf display
+const BOOK_COLORS = ['book-red','book-blue','book-green','book-brown','book-purple','book-black','book-teal','book-orange','book-navy','book-wine','book-forest','book-slate'];
+function getBookColor(idx) { return BOOK_COLORS[idx % BOOK_COLORS.length]; }
 function getCoverChar(title) {
-  const clean = title.replace(/[·「」《》（）\s]/g, '');
-  return clean.length <= 2 ? clean : clean.slice(0, 2);
+  const c = title.replace(/[·「」《》（）\-\s]/g, '');
+  return c.length <= 3 ? c : c.slice(0, 2);
 }
 
-const BANNER_BG = ['bg-1','bg-2','bg-3','bg-4','bg-5','bg-6'];
-
-const VINYL_BG_COLORS = [
+const VINYL_BG = [
   'linear-gradient(135deg, #2C1810, #1a0f0a)',
   'linear-gradient(135deg, #654321, #3E2723)',
   'linear-gradient(135deg, #8B0000, #3d0000)',
@@ -43,9 +41,7 @@ function getBookTotalPlays(b) { return b.tracks.reduce((s, t) => s + getPlayCoun
 // --- Init ---
 async function init() {
   books = await (await fetch('books.json')).json();
-  renderBanner();
-  renderTabs();
-  renderBookList();
+  renderBookshelf();
   window.addEventListener('hashchange', handleHash);
   handleHash();
 }
@@ -58,52 +54,54 @@ function handleHash() {
   } else goHome();
 }
 
-// --- Banner ---
-function renderBanner() {
-  const featured = books.filter(b => b.recommended);
-  document.getElementById('banner-scroll').innerHTML = featured.map((b, i) => `
-    <div class="banner-card ${BANNER_BG[i % BANNER_BG.length]}" onclick="location.hash='book/${b.id}'">
-      <div>
-        <div class="banner-title">${b.title}</div>
-        <div class="banner-desc">${b.desc}</div>
+// --- Bookshelf (grouped by category) ---
+function renderBookshelf() {
+  const catOrder = [];
+  const catMap = {};
+  books.forEach((b, i) => {
+    if (!catMap[b.category]) { catMap[b.category] = []; catOrder.push(b.category); }
+    catMap[b.category].push({ book: b, globalIdx: i });
+  });
+
+  const area = document.getElementById('bookshelf-area');
+  area.innerHTML = catOrder.map(cat => `
+    <div class="shelf">
+      <div class="shelf-label">${cat}</div>
+      <div class="shelf-books">
+        ${catMap[cat].map(({ book: b, globalIdx: gi }) => `
+          <a class="book" onclick="location.hash='book/${b.id}';return false;" href="#">
+            <div class="book-cover ${getBookColor(gi)}">
+              <h3>${getCoverChar(b.title)}</h3>
+            </div>
+          </a>
+        `).join('')}
       </div>
-      <span class="banner-tracks">${b.tracks.length}篇</span>
+      <div class="shelf-board"></div>
     </div>
   `).join('');
+
+  updateContinueCard();
 }
 
-// --- Tabs ---
-function renderTabs() {
-  const cats = ['全部', ...new Set(books.map(b => b.category))];
-  document.getElementById('tabs').innerHTML = cats.map(c =>
-    `<button class="tab${c === activeTab ? ' active' : ''}" onclick="switchTab('${c}')">${c}</button>`
-  ).join('');
+// --- Continue Listening sidebar ---
+function updateContinueCard() {
+  const card = document.getElementById('continue-card');
+  if (!currentBook) { card.classList.add('sidebar-hidden'); return; }
+  card.classList.remove('sidebar-hidden');
+  const gi = books.indexOf(currentBook);
+  const t = currentBook.tracks[currentTrackIdx];
+  const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
+  
+  const cover = document.getElementById('continue-cover');
+  cover.className = 'continue-cover ' + getBookColor(gi);
+  cover.innerHTML = `<h3>${getCoverChar(currentBook.title)}</h3>`;
+  
+  document.getElementById('continue-title').textContent = name;
+  document.getElementById('continue-sub').textContent = currentBook.title;
 }
-function switchTab(c) { activeTab = c; renderTabs(); renderBookList(); }
 
-// --- Book List ---
-function renderBookList() {
-  const filtered = activeTab === '全部' ? books : books.filter(b => b.category === activeTab);
-  document.getElementById('book-list').innerHTML = filtered.map(b => {
-    const gi = books.indexOf(b);
-    const total = getBookTotalPlays(b);
-    const badge = total > 0 ? `<span class="book-play-badge"><i class="ri-headphone-fill" style="font-size:10px"></i> ${total}</span>` : '';
-    return `
-      <div class="book-row" onclick="location.hash='book/${b.id}'">
-        <div class="book-cover-sm ${getCoverClass(gi)}">
-          <span class="cover-char">${getCoverChar(b.title)}</span>
-        </div>
-        <div class="book-meta">
-          <div class="book-meta-title">${b.title}</div>
-          <div class="book-meta-desc">${b.desc}</div>
-          <div class="book-meta-stats">
-            <span>${b.tracks.length}篇</span>
-            ${badge}
-          </div>
-        </div>
-        <i class="ri-arrow-right-s-line book-row-arrow"></i>
-      </div>`;
-  }).join('');
+function resumePlay() {
+  if (currentBook) { audio.paused ? audio.play() : playTrack(currentTrackIdx); }
 }
 
 // --- Book Detail ---
@@ -118,7 +116,7 @@ function showBook(book) {
   document.getElementById('detail-header').innerHTML = `
     <button class="detail-back" onclick="goHome()"><i class="ri-arrow-left-s-line"></i> 返回</button>
     <div class="book-hero">
-      <div class="detail-cover ${getCoverClass(gi)}">
+      <div class="detail-cover ${getBookColor(gi)}">
         <span class="cover-char">${getCoverChar(book.title)}</span>
       </div>
       <div class="detail-info">
@@ -133,19 +131,14 @@ function showBook(book) {
 
   document.getElementById('detail-actions').innerHTML = `
     <button class="action-btn action-btn-primary" onclick="playTrack(0)">
-      <i class="ri-play-circle-fill"></i>
-      <span>全部播放</span>
+      <i class="ri-play-circle-fill"></i> <span>全部播放</span>
     </button>
-    ${book.pdf ? `<button class="action-btn action-btn-ghost" onclick="togglePdf()"><i class="ri-book-open-line"></i> 查看原文</button>` : ''}
+    ${book.pdf ? `<button class="action-btn action-btn-ghost" onclick="togglePdf()"><i class="ri-book-open-line"></i> 原文</button>` : ''}
   `;
 
-  const loopIcon = loopMode === 'single' ? 'ri-repeat-one-line' : 'ri-repeat-line';
   document.getElementById('detail-tracks').innerHTML = `
     <div class="chapters">
-      <div class="track-header">
-        <span>全部篇章</span>
-        <span>共 ${book.tracks.length} 首</span>
-      </div>
+      <div class="track-header"><span>全部篇章</span><span>共 ${book.tracks.length} 首</span></div>
       <ul class="track-list">${
     book.tracks.map((t, i) => {
       const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
@@ -156,12 +149,10 @@ function showBook(book) {
         <span class="track-name">${name}</span>${badge}
         <i class="ri-play-fill track-icon"></i></li>`;
     }).join('')
-  }</ul>
-    </div>`;
+  }</ul></div>`;
 
   document.getElementById('book-pdf').innerHTML = book.pdf
-    ? `<div id="pdf-container" style="display:none"><iframe src="${TEXT_BASE}${encodeURIComponent(book.pdf)}"></iframe></div>`
-    : '';
+    ? `<div id="pdf-container" style="display:none"><iframe src="${TEXT_BASE}${encodeURIComponent(book.pdf)}"></iframe></div>` : '';
 }
 
 function togglePdf() {
@@ -173,7 +164,7 @@ function goHome() {
   location.hash = '';
   document.getElementById('page-book').classList.remove('active');
   document.getElementById('page-home').classList.add('active');
-  renderBookList();
+  updateContinueCard();
 }
 
 // --- Player ---
@@ -185,16 +176,16 @@ function playTrack(idx) {
   audio.play();
   
   const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
-  const bar = document.getElementById('player-bar');
-  bar.classList.remove('hidden');
+  document.getElementById('player-bar').classList.remove('hidden');
   document.getElementById('player-title').textContent = name;
   updatePlayerCount();
   
   const gi = books.indexOf(currentBook);
   const mc = document.getElementById('mini-cover');
-  mc.className = 'mini-cover ' + getCoverClass(gi);
+  mc.className = 'mini-cover ' + getBookColor(gi);
   mc.textContent = getCoverChar(currentBook.title);
   
+  // Highlight track
   document.querySelectorAll('.track-item').forEach(el => {
     el.classList.remove('playing');
     const icon = el.querySelector('.track-icon');
@@ -208,12 +199,13 @@ function playTrack(idx) {
     item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   
+  updateContinueCard();
+  
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({ title: name, artist: 'BabbleBee 古文磨耳朵', album: currentBook.title });
     navigator.mediaSession.setActionHandler('previoustrack', playerPrev);
     navigator.mediaSession.setActionHandler('nexttrack', playerNext);
   }
-  
   if (vinylOpen) { updateVinylInfo(); updateVinylDisc(); }
 }
 
@@ -254,16 +246,13 @@ function openVinyl() {
   document.getElementById('vinyl-player').classList.remove('hidden');
   document.getElementById('vinyl-book-title').textContent = currentBook.title;
   document.getElementById('vinyl-book-sub').textContent = currentBook.desc;
-  
   const gi = books.indexOf(currentBook);
-  document.getElementById('vinyl-bg').style.background = VINYL_BG_COLORS[gi % VINYL_BG_COLORS.length];
+  document.getElementById('vinyl-bg').style.background = VINYL_BG[gi % VINYL_BG.length];
   document.getElementById('vinyl-center').textContent = getCoverChar(currentBook.title);
-  document.getElementById('vinyl-center').className = 'vinyl-center ' + getCoverClass(gi);
-  
+  document.getElementById('vinyl-center').className = 'vinyl-center ' + getBookColor(gi);
   updateVinylInfo();
   requestAnimationFrame(() => updateVinylDisc());
 }
-
 function closeVinyl() { vinylOpen = false; document.getElementById('vinyl-player').classList.add('hidden'); }
 function showTrackList() { closeVinyl(); }
 
