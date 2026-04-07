@@ -260,7 +260,7 @@ function playTrack(idx) {
     navigator.mediaSession.setActionHandler('previoustrack', playerPrev);
     navigator.mediaSession.setActionHandler('nexttrack', playerNext);
   }
-  if (vinylOpen) { updateVinylInfo(); updateVinylDisc(); }
+  if (vinylOpen) { updateVinylInfo(); }
 }
 
 function playerToggle() { audio.paused ? audio.play() : audio.pause(); }
@@ -295,21 +295,30 @@ audio.addEventListener('ended', () => {
   loopMode === 'single' ? (audio.currentTime = 0, audio.play()) : playerNext();
 });
 
-// --- Vinyl Player ---
+// --- Sheet Player (bottom half-screen) ---
 function openVinyl() {
   if (!currentBook) return;
   vinylOpen = true;
-  document.getElementById('vinyl-player').classList.remove('hidden');
+  const sheet = document.getElementById('vinyl-player');
+  const overlay = document.getElementById('vinyl-overlay');
+  sheet.classList.remove('hidden');
+  overlay.classList.remove('hidden');
+  
   document.getElementById('vinyl-book-title').textContent = currentBook.title;
-  document.getElementById('vinyl-book-sub').textContent = currentBook.desc;
+  document.getElementById('vinyl-book-sub').textContent = `第 ${currentTrackIdx + 1} 章 · 共 ${currentBook.tracks.length} 章`;
+  
   const gi = books.indexOf(currentBook);
-  document.getElementById('vinyl-bg').style.background = VINYL_BG[gi % VINYL_BG.length];
-  document.getElementById('vinyl-center').textContent = getCoverChar(currentBook.title);
-  document.getElementById('vinyl-center').className = 'vinyl-center ' + getBookColor(gi);
+  const cover = document.getElementById('sheet-cover');
+  cover.className = 'sheet-cover ' + getBookColor(gi);
+  cover.textContent = getCoverChar(currentBook.title);
+  
   updateVinylInfo();
-  requestAnimationFrame(() => updateVinylDisc());
 }
-function closeVinyl() { vinylOpen = false; document.getElementById('vinyl-player').classList.add('hidden'); }
+function closeVinyl() {
+  vinylOpen = false;
+  document.getElementById('vinyl-player').classList.add('hidden');
+  document.getElementById('vinyl-overlay').classList.add('hidden');
+}
 function showTrackList() { closeVinyl(); }
 
 function updateVinylInfo() {
@@ -317,15 +326,22 @@ function updateVinylInfo() {
   const t = currentBook.tracks[currentTrackIdx];
   const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
   document.getElementById('vinyl-track-name').textContent = name;
+  document.getElementById('vinyl-book-sub').textContent = `第 ${currentTrackIdx + 1} 章 · 共 ${currentBook.tracks.length} 章`;
   const c = getPlayCount(t);
   document.getElementById('vinyl-track-count').textContent = c > 0 ? `已听 ${c} 遍` : '';
 }
 
-function updateVinylDisc() {
-  const disc = document.getElementById('vinyl-disc');
-  const arm = document.getElementById('vinyl-arm');
-  if (!audio.paused) { disc.classList.add('spinning'); arm.classList.add('on-disc'); }
-  else { disc.classList.remove('spinning'); arm.classList.remove('on-disc'); }
+function seekBack() { audio.currentTime = Math.max(0, audio.currentTime - 10); }
+function seekForward() { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); }
+
+let playbackSpeed = 1.0;
+function cycleSpeed() {
+  const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+  const idx = speeds.indexOf(playbackSpeed);
+  playbackSpeed = speeds[(idx + 1) % speeds.length];
+  audio.playbackRate = playbackSpeed;
+  const btn = document.getElementById('btn-speed');
+  if (btn) btn.querySelector('span').textContent = playbackSpeed + 'x';
 }
 
 function fmtTime(s) {
@@ -354,7 +370,6 @@ function syncPlayState() {
   document.getElementById('btn-play').innerHTML = playing ? '<i class="ri-pause-fill"></i>' : '<i class="ri-play-fill"></i>';
   const vb = document.getElementById('vinyl-btn-play');
   if (vb) vb.innerHTML = playing ? '<i class="ri-pause-fill" style="font-size:28px"></i>' : '<i class="ri-play-fill" style="font-size:28px"></i>';
-  updateVinylDisc();
 }
 audio.addEventListener('play', syncPlayState);
 audio.addEventListener('pause', syncPlayState);
