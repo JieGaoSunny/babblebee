@@ -347,44 +347,54 @@ body {
 
 /* ===== MINI PLAYER BAR ===== */
 .player-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
+  position: fixed; bottom: 12px; left: 12px; right: 12px;
   max-width: 1200px; margin: 0 auto;
-  background:
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E"),
-    linear-gradient(135deg, var(--wood-dark), var(--wood-darker));
+  background: rgba(44, 24, 16, 0.92);
+  backdrop-filter: blur(20px);
   display: flex; align-items: center;
-  padding: 10px 16px; z-index: 100; height: 64px;
-  border-top: 1px solid rgba(212,175,55,0.2);
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+  padding: 8px 12px; z-index: 100; height: 56px;
+  border-radius: 28px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
 }
 .player-bar.hidden { display: none !important; }
 
 .mini-cover {
-  width: 44px; height: 44px; border-radius: 8px;
+  width: 40px; height: 40px; border-radius: 50%;
   flex-shrink: 0; margin-right: 12px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--serif); font-weight: 700; font-size: 13px;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+  font-family: var(--serif); font-weight: 700; font-size: 11px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .mini-info { flex: 1; min-width: 0; cursor: pointer; }
 .mini-title { font-size: 14px; font-weight: 600; color: var(--cream); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: 1px; }
-.mini-sub { font-size: 11px; color: var(--wood-light); display: flex; gap: 6px; }
-.mini-controls { display: flex; gap: 0; align-items: center; }
+.mini-sub { font-size: 11px; color: rgba(222,184,135,0.7); display: flex; gap: 6px; }
+.mini-controls { display: flex; gap: 4px; align-items: center; }
 .mini-btn {
   width: 36px; height: 36px; border-radius: 50%;
   border: none; background: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   color: var(--cream); font-size: 18px;
+  transition: color 0.2s;
 }
-.mini-btn-play { font-size: 24px; width: 42px; height: 42px; }
+.mini-btn-play {
+  font-size: 22px; width: 40px; height: 40px;
+  background: rgba(255,255,255,0.1); border-radius: 50%;
+}
 .mini-btn-sm { font-size: 14px; color: rgba(253,245,230,0.5); width: 30px; height: 30px; }
 .mini-btn:active { color: var(--gold); }
-.mini-progress { position: absolute; top: -2px; left: 0; right: 0; height: 3px; }
+.mini-progress { position: absolute; top: 0; left: 0; right: 0; height: 0; overflow: hidden; }
 #progress-bar {
   width: 100%; height: 3px; -webkit-appearance: none; appearance: none;
   background: rgba(255,255,255,0.15); border-radius: 0; outline: none; margin: 0;
 }
 #progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 0; height: 0; }
+
+/* Progress ring around play button */
+.mini-btn-play { position: relative; }
+.progress-ring { position: absolute; top: 0; left: 0; width: 40px; height: 40px; transform: rotate(-90deg); pointer-events: none; }
+.progress-ring circle { fill: none; stroke-width: 2.5; }
+.progress-ring .ring-bg { stroke: rgba(255,255,255,0.15); }
+.progress-ring .ring-fg { stroke: var(--gold); stroke-linecap: round; transition: stroke-dashoffset 0.3s; }
 
 /* ===== INLINE PDF VIEWER ===== */
 .pdf-viewer {
@@ -451,11 +461,12 @@ body {
   .shelf-label { font-size: 13px; letter-spacing: 3px; }
   /* mini player responsive */
   .mini-btn-sm { width: 28px; height: 28px; font-size: 12px; }
-  .player-bar { padding: 8px 10px; height: 56px; bottom: 0; }
-  .mini-cover { width: 38px; height: 38px; margin-right: 8px; font-size: 11px; }
+  .player-bar { padding: 6px 10px; height: 52px; bottom: 8px; left: 8px; right: 8px; border-radius: 26px; }
+  .mini-cover { width: 36px; height: 36px; margin-right: 8px; font-size: 10px; }
   .mini-title { font-size: 13px; }
   .mini-btn { width: 32px; height: 32px; font-size: 16px; }
-  .mini-btn-play { width: 38px; height: 38px; font-size: 22px; }
+  .mini-btn-play { width: 36px; height: 36px; font-size: 20px; }
+  .progress-ring { width: 36px; height: 36px; }
   /* detail page responsive */
   .book-hero { flex-direction: column; align-items: center; text-align: center; }
   .detail-cover { width: 100px; height: 140px; }

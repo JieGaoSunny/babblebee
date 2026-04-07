@@ -294,7 +294,10 @@ function fmtTime(s) {
 
 audio.addEventListener('timeupdate', () => {
   if (audio.duration) {
-    document.getElementById('progress-bar').value = (audio.currentTime / audio.duration) * 100;
+    const pct = audio.currentTime / audio.duration;
+    document.getElementById('progress-bar').value = pct * 100;
+    const ring = document.getElementById('progress-ring-fg');
+    if (ring) { const c = 106.8; ring.style.strokeDashoffset = c - (c * pct); }
   }
 });
 

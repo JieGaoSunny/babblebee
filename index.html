@@ -59,7 +59,10 @@
     </div>
     <div class="mini-controls">
       <button onclick="playerPrev()" class="mini-btn" title="上一首"><i class="ri-skip-back-fill"></i></button>
-      <button onclick="playerToggle()" id="btn-play" class="mini-btn mini-btn-play"><i class="ri-play-fill"></i></button>
+      <button onclick="playerToggle()" id="btn-play" class="mini-btn mini-btn-play">
+        <svg class="progress-ring" viewBox="0 0 40 40"><circle class="ring-bg" cx="20" cy="20" r="17"/><circle class="ring-fg" id="progress-ring-fg" cx="20" cy="20" r="17" stroke-dasharray="106.8" stroke-dashoffset="106.8"/></svg>
+        <i class="ri-play-fill"></i>
+      </button>
       <button onclick="playerNext()" class="mini-btn" title="下一首"><i class="ri-skip-forward-fill"></i></button>
       <button onclick="toggleLoop()" id="mini-btn-loop" class="mini-btn mini-btn-sm" title="循环模式"><i class="ri-repeat-one-line"></i></button>
     </div>
