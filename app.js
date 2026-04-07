@@ -178,13 +178,15 @@ function togglePdfView() {
   }
   if (!currentBook || !currentBook.pdf) return;
   const url = TEXT_BASE + encodeURIComponent(currentBook.pdf);
+  const viewerUrl = 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(url);
   container.innerHTML = `
     <div class="pdf-viewer">
       <div class="pdf-header">
         <span>${currentBook.title} · 原文</span>
+        <a href="${url}" target="_blank" class="pdf-open-btn" title="新窗口打开"><i class="ri-external-link-line"></i></a>
         <button onclick="togglePdfView()" class="pdf-close"><i class="ri-close-line"></i></button>
       </div>
-      <iframe src="${url}" class="pdf-iframe"></iframe>
+      <iframe src="${viewerUrl}" class="pdf-iframe"></iframe>
     </div>`;
   pdfVisible = true;
   container.scrollIntoView({ behavior: 'smooth' });

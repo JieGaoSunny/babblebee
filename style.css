@@ -52,11 +52,11 @@ body {
   position: sticky; top: 0; z-index: 50;
   backdrop-filter: blur(10px);
 }
-.header-left { display: flex; align-items: center; gap: 12px; }
+.header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .topbar-logo { width: 32px; height: 32px; border-radius: 8px; }
 .header h1 { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: 6px; line-height: 1; }
 .header-en { font-family: 'Italiana', serif; font-size: 16px; color: var(--ink-light); letter-spacing: 2px; line-height: 1; }
-.header-slogan { font-size: 11px; color: var(--wood-medium); letter-spacing: 2px; line-height: 1; white-space: nowrap; }
+.header-slogan { font-size: 11px; color: var(--wood-medium); letter-spacing: 2px; line-height: 1; white-space: nowrap; width: 100%; margin-top: -4px; }
 .header-actions { display: flex; gap: 20px; }
 .header-actions i { font-size: 24px; color: var(--ink-light); cursor: pointer; transition: color 0.2s; }
 .header-actions i:hover { color: var(--gold); }
@@ -403,6 +403,10 @@ body {
   font-size: 20px; color: var(--ink-light); padding: 4px;
 }
 .pdf-close:hover { color: var(--red); }
+.pdf-open-btn {
+  font-size: 18px; color: var(--ink-light); padding: 4px; text-decoration: none; margin-left: auto;
+}
+.pdf-open-btn:hover { color: var(--gold); }
 .pdf-iframe {
   width: 100%; height: 70vh; border: none; display: block;
 }
@@ -438,10 +442,10 @@ body {
   .continue-cover h3 { font-size: 12px; letter-spacing: 2px; }
   .continue-title { font-size: 13px; }
   .continue-label { font-size: 11px; }
-  .continue-play { width: 40px; height: 40px; font-size: 20px; }
+  .continue-play { width: 40px; height: 40px; font-size: 20px; flex-shrink: 0; }
   .bookshelf-area { padding: 14px; }
   .shelf-board { height: 22px; margin: 0 -14px; }
-  .shelf-books { gap: 12px; flex-wrap: nowrap; overflow-x: auto; }
+  .shelf-books { gap: 12px; flex-wrap: nowrap; overflow-x: auto; padding-right: 14px; }
   .book-cover { width: 72px; height: 100px; }
   .book-cover h3 { font-size: 14px; letter-spacing: 3px; }
   .shelf-label { font-size: 13px; letter-spacing: 3px; }
