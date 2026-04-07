@@ -181,7 +181,7 @@ function togglePdfView() {
   container.innerHTML = `
     <div class="pdf-viewer">
       <div class="pdf-header">
-        <span>📖 ${currentBook.title} · 原文</span>
+        <span>${currentBook.title} · 原文</span>
         <button onclick="togglePdfView()" class="pdf-close"><i class="ri-close-line"></i></button>
       </div>
       <iframe src="${url}" class="pdf-iframe"></iframe>
