@@ -201,6 +201,8 @@ body {
   position: relative; z-index: 1;
   text-shadow: 2px 2px 3px rgba(0,0,0,0.4);
 }
+.book-cover h3.chars-4 { font-size: 14px; letter-spacing: 4px; }
+.book-cover h3.chars-5 { font-size: 12px; letter-spacing: 3px; }
 
 /* Book color themes */
 .book-red    { background: linear-gradient(135deg, #A52A2A, var(--red), var(--red-dark)); color: var(--gold); }

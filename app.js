@@ -13,8 +13,24 @@ const audio = document.getElementById('audio');
 const BOOK_COLORS = ['book-red','book-blue','book-green','book-brown','book-purple','book-black','book-teal','book-orange','book-navy','book-wine','book-forest','book-slate'];
 function getBookColor(idx) { return BOOK_COLORS[idx % BOOK_COLORS.length]; }
 function getCoverChar(title) {
+  const map = {
+    '三字经':'三字经','弟子规':'弟子规','千字文':'千字文','百家姓':'百家姓',
+    '笠翁对韵·上':'笠翁上','笠翁对韵·下':'笠翁下',
+    '老子':'老子','庄子':'庄子','孙子兵法':'孙子兵法',
+    '诗经':'诗经','唐诗':'唐诗','宋词':'宋词',
+    '历代诗歌':'历代诗歌','历代美文':'历代美文','左传':'左传','史记':'史记',
+  };
+  if (map[title]) return map[title];
   const c = title.replace(/[·「」《》（）\-\s]/g, '');
-  return c.length <= 3 ? c : c.slice(0, 2);
+  if (/^[A-Za-z]/.test(c)) return c.slice(0, 2);
+  return c.length <= 4 ? c : c.slice(0, 4);
+}
+
+function getCoverSizeClass(title) {
+  const len = getCoverChar(title).length;
+  if (len >= 5) return 'chars-5';
+  if (len >= 4) return 'chars-4';
+  return '';
 }
 
 const VINYL_BG = [
@@ -82,7 +98,7 @@ function renderBookshelf() {
       <div class="shelf-books">
         ${catMap[cat].map(({ book: b, globalIdx: gi }) => `
           <a class="book" onclick="location.hash='book/${b.id}';return false;" href="#">
-            <div class="book-cover ${getBookColor(gi)}"><h3>${getCoverChar(b.title)}</h3></div>
+            <div class="book-cover ${getBookColor(gi)}"><h3 class="${getCoverSizeClass(b.title)}">${getCoverChar(b.title)}</h3></div>
           </a>
         `).join('')}
       </div>
