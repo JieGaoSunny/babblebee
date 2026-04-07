@@ -43,15 +43,13 @@
     <div class="spacer"></div>
   </main>
 
-  <!-- bottom nav removed -->
-
   <!-- ===== MINI PLAYER BAR ===== -->
   <div id="player-bar" class="player-bar hidden">
     <div class="mini-progress">
       <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
     </div>
-    <div class="mini-cover" id="mini-cover" onclick="openVinyl()"></div>
-    <div class="mini-info" onclick="openVinyl()">
+    <div class="mini-cover" id="mini-cover"></div>
+    <div class="mini-info">
       <div class="mini-title" id="player-title">未播放</div>
       <div class="mini-sub">
         <span id="player-book"></span>
@@ -63,39 +61,6 @@
       <button onclick="playerToggle()" id="btn-play" class="mini-btn mini-btn-play"><i class="ri-play-fill"></i></button>
       <button onclick="playerNext()" class="mini-btn" title="下一首"><i class="ri-skip-forward-fill"></i></button>
       <button onclick="toggleLoop()" id="mini-btn-loop" class="mini-btn mini-btn-sm" title="循环模式"><i class="ri-repeat-one-line"></i></button>
-    </div>
-  </div>
-
-  <!-- ===== BOTTOM SHEET PLAYER ===== -->
-  <div id="vinyl-overlay" class="sheet-overlay hidden" onclick="closeVinyl()"></div>
-  <div id="vinyl-player" class="sheet-player hidden">
-    <div class="sheet-handle" onclick="closeVinyl()"><div class="sheet-handle-bar"></div></div>
-    <div class="sheet-top">
-      <div class="sheet-cover" id="sheet-cover"></div>
-      <div class="sheet-meta">
-        <div class="sheet-track-name" id="vinyl-track-name">—</div>
-        <div class="sheet-track-sub" id="vinyl-book-title">—</div>
-        <div class="sheet-track-sub" id="vinyl-book-sub"></div>
-        <div class="sheet-track-count" id="vinyl-track-count"></div>
-      </div>
-    </div>
-    <div class="sheet-progress">
-      <input type="range" id="vinyl-progress-bar" min="0" max="100" value="0" step="0.1">
-      <div class="sheet-times"><span id="vinyl-time-cur">0:00</span><span id="vinyl-time-dur">0:00</span></div>
-    </div>
-    <div class="sheet-controls">
-      <button onclick="playerPrev()" class="sheet-btn"><i class="ri-skip-back-fill"></i></button>
-      <button onclick="seekBack()" class="sheet-btn sheet-btn-sm"><i class="ri-replay-10-line"></i></button>
-      <button onclick="playerToggle()" id="vinyl-btn-play" class="sheet-btn sheet-btn-play"><i class="ri-play-fill"></i></button>
-      <button onclick="seekForward()" class="sheet-btn sheet-btn-sm"><i class="ri-forward-10-line"></i></button>
-      <button onclick="playerNext()" class="sheet-btn"><i class="ri-skip-forward-fill"></i></button>
-    </div>
-    <div class="sheet-actions">
-      <button onclick="toggleLoop()" id="vinyl-btn-loop" class="sheet-action"><i class="ri-repeat-one-line"></i><span>单曲</span></button>
-      <button onclick="toggleLoop()" class="sheet-action"><i class="ri-repeat-line"></i><span>整本</span></button>
-      <button onclick="openPdf()" class="sheet-action"><i class="ri-text"></i><span>A-B</span></button>
-      <button onclick="cycleSpeed()" id="btn-speed" class="sheet-action"><i class="ri-speed-line"></i><span>1.0x</span></button>
-      <button class="sheet-action" onclick="showTrackList()"><i class="ri-moon-line"></i><span>定时</span></button>
     </div>
   </div>
 

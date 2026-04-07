@@ -6,14 +6,12 @@ const TEXT_BASE = 'https://jiettsstorage.blob.core.windows.net/babblebee/texts/'
 let books = [];
 let currentBook = null;
 let currentTrackIdx = 0;
-let loopMode = 'single'; // single | list
-let vinylOpen = false;
+let loopMode = 'single'; // single | list | chapter
 const audio = document.getElementById('audio');
 
 const BOOK_COLORS = ['book-red','book-blue','book-green','book-brown','book-purple','book-black','book-teal','book-orange','book-navy','book-wine','book-forest','book-slate'];
 function getBookColor(idx) { return BOOK_COLORS[idx % BOOK_COLORS.length]; }
 function getCoverChar(title) {
-  // Every book gets a hand-crafted cover name for vertical spine display
   const map = {
     '三字经':'三字经', '弟子规':'弟子规', '千字文':'千字文', '百家姓':'百家姓',
     '笠翁对韵·上':'笠翁上', '笠翁对韵·下':'笠翁下',
@@ -26,11 +24,9 @@ function getCoverChar(title) {
     'Nursery Rhymes 英文儿歌':'英文儿歌',
   };
   if (map[title]) return map[title];
-  // Fallback: strip punctuation, take up to 4 chars
   const c = title.replace(/[·「」《》（）\-\s]/g, '');
   return c.length <= 4 ? c : c.slice(0, 4);
 }
-
 function getCoverSizeClass(title) {
   const len = getCoverChar(title).length;
   if (len >= 5) return 'chars-5';
@@ -38,35 +34,17 @@ function getCoverSizeClass(title) {
   return '';
 }
 
-const VINYL_BG = [
-  'linear-gradient(135deg, #2C1810, #1a0f0a)',
-  'linear-gradient(135deg, #654321, #3E2723)',
-  'linear-gradient(135deg, #8B0000, #3d0000)',
-  'linear-gradient(135deg, #1a1a2e, #0d0d1a)',
-  'linear-gradient(135deg, #1b4332, #0a2e10)',
-  'linear-gradient(135deg, #3c1518, #1a0a0c)',
-  'linear-gradient(135deg, #4A3728, #2C1810)',
-  'linear-gradient(135deg, #5f0f40, #3d0525)',
-  'linear-gradient(135deg, #8B5A2B, #4A3728)',
-  'linear-gradient(135deg, #3d405b, #1d1f2e)',
-  'linear-gradient(135deg, #6b2737, #3a1520)',
-  'linear-gradient(135deg, #0b3954, #051c2c)',
-];
-
 // --- Storage ---
 function getPlayCount(t) { return parseInt(localStorage.getItem('pc:' + t) || '0'); }
 function incPlayCount(t) { const c = getPlayCount(t) + 1; localStorage.setItem('pc:' + t, c); return c; }
 function getBookTotalPlays(b) { return b.tracks.reduce((s, t) => s + getPlayCount(t), 0); }
-
 function saveLastPlayed() {
   if (!currentBook) return;
   localStorage.setItem('lastBook', currentBook.id);
   localStorage.setItem('lastTrack', String(currentTrackIdx));
 }
 function getLastPlayed() {
-  const bid = localStorage.getItem('lastBook');
-  const tidx = parseInt(localStorage.getItem('lastTrack') || '0');
-  return { bookId: bid, trackIdx: tidx };
+  return { bookId: localStorage.getItem('lastBook'), trackIdx: parseInt(localStorage.getItem('lastTrack') || '0') };
 }
 
 // --- Init ---
@@ -86,18 +64,15 @@ function handleHash() {
   } else goHome();
 }
 
-// --- Bookshelf ---
+// --- Bookshelf (no expand, just books) ---
 function renderBookshelf() {
-  const catOrder = [];
-  const catMap = {};
+  const catOrder = []; const catMap = {};
   books.forEach((b, i) => {
     if (!catMap[b.category]) { catMap[b.category] = []; catOrder.push(b.category); }
     catMap[b.category].push({ book: b, globalIdx: i });
   });
 
-  document.getElementById('bookshelf-area').innerHTML = catOrder.map((cat, ci) => {
-    const isEnglish = cat === '英文';
-    return `
+  document.getElementById('bookshelf-area').innerHTML = catOrder.map(cat => `
     <div class="shelf">
       <div class="shelf-label">${cat}</div>
       <div class="shelf-books">
@@ -107,43 +82,9 @@ function renderBookshelf() {
           </a>
         `).join('')}
       </div>
-      <div class="shelf-expand-btn" onclick="toggleShelfExpand('shelf-expand-${ci}', this)">
-        <i class="${isEnglish ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'}"></i> <span>${isEnglish ? '收起目录' : '展开目录'}</span>
-      </div>
-      <div class="shelf-expand" id="shelf-expand-${ci}" style="${isEnglish ? '' : 'display:none'}">
-        ${catMap[cat].map(({ book: b, globalIdx: gi }) => `
-          <div class="shelf-book-tracks">
-            <div class="shelf-book-name">${b.title}</div>
-            <div class="shelf-track-list">
-              ${b.tracks.map((t, ti) => {
-                const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
-                return `<span class="shelf-track-chip" onclick="playFromShelf('${b.id}',${ti})">${name}</span>`;
-              }).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
       <div class="shelf-board"></div>
     </div>
-  `}).join('');
-}
-
-function toggleShelfExpand(id, btn) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const showing = el.style.display !== 'none';
-  el.style.display = showing ? 'none' : 'block';
-  btn.querySelector('span').textContent = showing ? '展开目录' : '收起目录';
-  btn.querySelector('i').className = showing ? 'ri-arrow-down-s-line' : 'ri-arrow-up-s-line';
-}
-
-function playFromShelf(bookId, trackIdx) {
-  const book = books.find(b => b.id === bookId);
-  if (!book) return;
-  currentBook = book;
-  currentTrackIdx = trackIdx;
-  location.hash = 'book/' + book.id;
-  setTimeout(() => playTrack(trackIdx), 300);
+  `).join('');
 }
 
 // --- Continue Listening Card ---
@@ -151,12 +92,7 @@ function renderContinueCard() {
   const card = document.getElementById('continue-card');
   let { bookId, trackIdx } = getLastPlayed();
   let book = bookId ? books.find(b => b.id === bookId) : null;
-
-  // Default to 三字经 if no history
-  if (!book) {
-    book = books.find(b => b.id === 'sanzijing') || books[0];
-    trackIdx = 0;
-  }
+  if (!book) { book = books.find(b => b.id === 'sanzijing') || books[0]; trackIdx = 0; }
 
   const gi = books.indexOf(book);
   const t = book.tracks[trackIdx] || book.tracks[0];
@@ -210,7 +146,7 @@ function showBook(book) {
     <button class="action-btn action-btn-primary" onclick="playTrack(0)">
       <i class="ri-play-circle-fill"></i> <span>全部播放</span>
     </button>
-    ${book.pdf ? `<button class="action-btn action-btn-ghost" onclick="openPdf()"><i class="ri-book-open-line"></i> 原文</button>` : ''}
+    ${book.pdf ? `<button class="action-btn action-btn-ghost" onclick="togglePdfView()"><i class="ri-book-open-line"></i> 原文</button>` : ''}
   `;
 
   document.getElementById('detail-tracks').innerHTML = `
@@ -231,23 +167,34 @@ function showBook(book) {
   document.getElementById('book-pdf').innerHTML = '';
 }
 
-// Open PDF via hidden link (avoids popup blockers)
-function openPdf() {
+// --- Inline PDF Viewer ---
+let pdfVisible = false;
+function togglePdfView() {
+  const container = document.getElementById('book-pdf');
+  if (pdfVisible) {
+    container.innerHTML = '';
+    pdfVisible = false;
+    return;
+  }
   if (!currentBook || !currentBook.pdf) return;
   const url = TEXT_BASE + encodeURIComponent(currentBook.pdf);
-  const a = document.createElement('a');
-  a.href = url;
-  a.target = '_blank';
-  a.rel = 'noopener';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  container.innerHTML = `
+    <div class="pdf-viewer">
+      <div class="pdf-header">
+        <span>📖 ${currentBook.title} · 原文</span>
+        <button onclick="togglePdfView()" class="pdf-close"><i class="ri-close-line"></i></button>
+      </div>
+      <iframe src="${url}" class="pdf-iframe"></iframe>
+    </div>`;
+  pdfVisible = true;
+  container.scrollIntoView({ behavior: 'smooth' });
 }
 
 function goHome() {
   location.hash = '';
   document.getElementById('page-book').classList.remove('active');
   document.getElementById('page-home').classList.add('active');
+  pdfVisible = false;
   renderContinueCard();
 }
 
@@ -259,19 +206,19 @@ function playTrack(idx) {
   audio.src = AUDIO_BASE + encodeURIComponent(t);
   audio.play();
   saveLastPlayed();
-  
+
   const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
   document.getElementById('player-bar').classList.remove('hidden');
   document.getElementById('player-title').textContent = name;
   document.getElementById('player-book').textContent = currentBook.title;
   updatePlayerCount();
-  
+
   const gi = books.indexOf(currentBook);
   const mc = document.getElementById('mini-cover');
   mc.className = 'mini-cover ' + getBookColor(gi);
   mc.textContent = getCoverChar(currentBook.title);
-  
-  // Highlight
+
+  // Highlight track
   document.querySelectorAll('.track-item').forEach(el => {
     el.classList.remove('playing');
     const icon = el.querySelector('.track-icon');
@@ -284,13 +231,12 @@ function playTrack(idx) {
     if (icon) icon.className = 'ri-volume-up-fill track-icon';
     item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  
+
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({ title: name, artist: 'BabbleBee 古文磨耳朵', album: currentBook.title });
     navigator.mediaSession.setActionHandler('previoustrack', playerPrev);
     navigator.mediaSession.setActionHandler('nexttrack', playerNext);
   }
-  if (vinylOpen) { updateVinylInfo(); }
 }
 
 function playerToggle() { audio.paused ? audio.play() : audio.pause(); }
@@ -298,11 +244,16 @@ function playerPrev() { if (currentBook) playTrack((currentTrackIdx - 1 + curren
 function playerNext() { if (currentBook) playTrack((currentTrackIdx + 1) % currentBook.tracks.length); }
 
 function toggleLoop() {
-  loopMode = loopMode === 'single' ? 'list' : 'single';
-  const vb = document.getElementById('vinyl-btn-loop');
-  if (vb) vb.innerHTML = `<i class="${loopMode === 'single' ? 'ri-repeat-one-line' : 'ri-repeat-line'}"></i>`;
+  const modes = ['chapter', 'single', 'list'];
+  const labels = { chapter: '本章', single: '单曲', list: '顺序' };
+  const icons = { chapter: 'ri-play-line', single: 'ri-repeat-one-line', list: 'ri-repeat-line' };
+  const ci = modes.indexOf(loopMode);
+  loopMode = modes[(ci + 1) % modes.length];
   const mb = document.getElementById('mini-btn-loop');
-  if (mb) mb.innerHTML = `<i class="${loopMode === 'single' ? 'ri-repeat-one-line' : 'ri-repeat-line'}"></i>`;
+  if (mb) {
+    mb.innerHTML = `<i class="${icons[loopMode]}"></i>`;
+    mb.title = labels[loopMode];
+  }
 }
 
 function updatePlayerCount() {
@@ -322,57 +273,17 @@ audio.addEventListener('ended', () => {
     if (!badge) { badge = document.createElement('span'); badge.className = 'track-plays'; items[currentTrackIdx].appendChild(badge); }
     badge.textContent = `×${getPlayCount(t)}`;
   }
-  loopMode === 'single' ? (audio.currentTime = 0, audio.play()) : playerNext();
+  if (loopMode === 'chapter') {
+    // Play once, stop
+    audio.pause();
+    syncPlayState();
+  } else if (loopMode === 'single') {
+    audio.currentTime = 0;
+    audio.play();
+  } else {
+    playerNext();
+  }
 });
-
-// --- Sheet Player (bottom half-screen) ---
-function openVinyl() {
-  if (!currentBook) return;
-  vinylOpen = true;
-  const sheet = document.getElementById('vinyl-player');
-  const overlay = document.getElementById('vinyl-overlay');
-  sheet.classList.remove('hidden');
-  overlay.classList.remove('hidden');
-  
-  document.getElementById('vinyl-book-title').textContent = currentBook.title;
-  document.getElementById('vinyl-book-sub').textContent = `第 ${currentTrackIdx + 1} 章 · 共 ${currentBook.tracks.length} 章`;
-  
-  const gi = books.indexOf(currentBook);
-  const cover = document.getElementById('sheet-cover');
-  cover.className = 'sheet-cover ' + getBookColor(gi);
-  cover.textContent = getCoverChar(currentBook.title);
-  
-  updateVinylInfo();
-}
-function closeVinyl() {
-  vinylOpen = false;
-  document.getElementById('vinyl-player').classList.add('hidden');
-  document.getElementById('vinyl-overlay').classList.add('hidden');
-}
-function showTrackList() { closeVinyl(); }
-
-function updateVinylInfo() {
-  if (!currentBook) return;
-  const t = currentBook.tracks[currentTrackIdx];
-  const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
-  document.getElementById('vinyl-track-name').textContent = name;
-  document.getElementById('vinyl-book-sub').textContent = `第 ${currentTrackIdx + 1} 章 · 共 ${currentBook.tracks.length} 章`;
-  const c = getPlayCount(t);
-  document.getElementById('vinyl-track-count').textContent = c > 0 ? `已听 ${c} 遍` : '';
-}
-
-function seekBack() { audio.currentTime = Math.max(0, audio.currentTime - 10); }
-function seekForward() { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); }
-
-let playbackSpeed = 1.0;
-function cycleSpeed() {
-  const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
-  const idx = speeds.indexOf(playbackSpeed);
-  playbackSpeed = speeds[(idx + 1) % speeds.length];
-  audio.playbackRate = playbackSpeed;
-  const btn = document.getElementById('btn-speed');
-  if (btn) btn.querySelector('span').textContent = playbackSpeed + 'x';
-}
 
 function fmtTime(s) {
   if (!s || isNaN(s)) return '0:00';
@@ -381,25 +292,17 @@ function fmtTime(s) {
 
 audio.addEventListener('timeupdate', () => {
   if (audio.duration) {
-    const pct = (audio.currentTime / audio.duration) * 100;
-    document.getElementById('progress-bar').value = pct;
-    if (vinylOpen) {
-      document.getElementById('vinyl-progress-bar').value = pct;
-      document.getElementById('vinyl-time-cur').textContent = fmtTime(audio.currentTime);
-      document.getElementById('vinyl-time-dur').textContent = fmtTime(audio.duration);
-    }
+    document.getElementById('progress-bar').value = (audio.currentTime / audio.duration) * 100;
   }
 });
 
-document.getElementById('vinyl-progress-bar').addEventListener('input', e => {
+document.getElementById('progress-bar').addEventListener('input', e => {
   if (audio.duration) audio.currentTime = (e.target.value / 100) * audio.duration;
 });
 
 function syncPlayState() {
   const playing = !audio.paused;
   document.getElementById('btn-play').innerHTML = playing ? '<i class="ri-pause-fill"></i>' : '<i class="ri-play-fill"></i>';
-  const vb = document.getElementById('vinyl-btn-play');
-  if (vb) vb.innerHTML = playing ? '<i class="ri-pause-fill" style="font-size:28px"></i>' : '<i class="ri-play-fill" style="font-size:28px"></i>';
 }
 audio.addEventListener('play', syncPlayState);
 audio.addEventListener('pause', syncPlayState);
