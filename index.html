@@ -15,19 +15,23 @@
 
   <!-- ===== HOME PAGE ===== -->
   <main id="page-home" class="page active">
-    <div class="topbar">
-      <div class="topbar-left">
+    <header class="header">
+      <div class="header-left">
         <img src="logo.png" alt="" class="topbar-logo">
-        <span class="topbar-title">古文磨耳朵</span>
-        <span class="topbar-en">BabbleBee</span>
+        <h1>古文磨耳朵</h1>
+        <span class="header-en">BabbleBee</span>
       </div>
-    </div>
+      <div class="header-actions">
+        <i class="ri-search-line"></i>
+      </div>
+    </header>
     <div class="main-content">
       <aside class="sidebar" id="sidebar">
         <div class="continue-card" id="continue-card"></div>
       </aside>
       <div class="bookshelf-area" id="bookshelf-area"></div>
     </div>
+    <div class="spacer"></div>
   </main>
 
   <!-- ===== BOOK DETAIL PAGE ===== -->
@@ -36,7 +40,24 @@
     <div class="detail-actions" id="detail-actions"></div>
     <div class="detail-tracks" id="detail-tracks"></div>
     <div id="book-pdf"></div>
+    <div class="spacer"></div>
   </main>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <a class="nav-item active" onclick="goHome()">
+      <i class="ri-book-shelf-line"></i>
+      <span>书架</span>
+    </a>
+    <a class="nav-item" onclick="goHome()">
+      <i class="ri-compass-3-line"></i>
+      <span>发现</span>
+    </a>
+    <a class="nav-item" onclick="goHome()">
+      <i class="ri-user-3-line"></i>
+      <span>我的</span>
+    </a>
+  </nav>
 
   <!-- ===== MINI PLAYER BAR ===== -->
   <div id="player-bar" class="player-bar hidden">
