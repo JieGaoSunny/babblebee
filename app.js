@@ -13,16 +13,21 @@ const audio = document.getElementById('audio');
 const BOOK_COLORS = ['book-red','book-blue','book-green','book-brown','book-purple','book-black','book-teal','book-orange','book-navy','book-wine','book-forest','book-slate'];
 function getBookColor(idx) { return BOOK_COLORS[idx % BOOK_COLORS.length]; }
 function getCoverChar(title) {
+  // Every book gets a hand-crafted cover name for vertical spine display
   const map = {
-    '三字经':'三字经','弟子规':'弟子规','千字文':'千字文','百家姓':'百家姓',
-    '笠翁对韵·上':'笠翁上','笠翁对韵·下':'笠翁下',
-    '老子':'老子','庄子':'庄子','孙子兵法':'孙子兵法',
-    '诗经':'诗经','唐诗':'唐诗','宋词':'宋词',
-    '历代诗歌':'历代诗歌','历代美文':'历代美文','左传':'左传','史记':'史记',
+    '三字经':'三字经', '弟子规':'弟子规', '千字文':'千字文', '百家姓':'百家姓',
+    '笠翁对韵·上':'笠翁上', '笠翁对韵·下':'笠翁下',
+    '老子':'老子', '庄子':'庄子', '孙子兵法':'孙子兵法',
+    '诗经':'诗经', '唐诗':'唐诗', '宋词':'宋词',
+    '历代诗歌':'历代诗歌', '历代美文':'历代美文', '左传':'左传', '史记':'史记',
+    'Princess 豌豆公主':'豌豆公主', 'Grandmother 祖母':'祖母',
+    'Andersen 安徒生童话':'安徒生', 'An Ant 蚂蚁与鸽子':'蚂蚁鸽子',
+    "Aesop's Fables":'伊索寓言', 'Peter Rabbit 彼得兔':'彼得兔',
+    'Nursery Rhymes 英文儿歌':'英文儿歌',
   };
   if (map[title]) return map[title];
+  // Fallback: strip punctuation, take up to 4 chars
   const c = title.replace(/[·「」《》（）\-\s]/g, '');
-  if (/^[A-Za-z]/.test(c)) return c.slice(0, 2);
   return c.length <= 4 ? c : c.slice(0, 4);
 }
 
