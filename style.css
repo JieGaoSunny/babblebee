@@ -56,7 +56,7 @@ body {
 .topbar-logo { width: 32px; height: 32px; border-radius: 8px; }
 .header h1 { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: 6px; line-height: 1; }
 .header-en { font-family: 'Italiana', serif; font-size: 16px; color: var(--ink-light); letter-spacing: 2px; line-height: 1; }
-.header-slogan { font-size: 11px; color: var(--wood-medium); letter-spacing: 2px; line-height: 1; white-space: nowrap; width: 100%; margin-top: -4px; }
+.header-slogan { font-size: 11px; color: var(--wood-medium); letter-spacing: 0.5px; line-height: 1; white-space: nowrap; width: 100%; margin-top: -4px; }
 .header-actions { display: flex; gap: 20px; }
 .header-actions i { font-size: 24px; color: var(--ink-light); cursor: pointer; transition: color 0.2s; }
 .header-actions i:hover { color: var(--gold); }
@@ -150,7 +150,8 @@ body {
 
 .shelf-books {
   display: flex; gap: 18px; padding-bottom: 24px;
-  overflow-x: auto; scrollbar-width: none; flex-wrap: wrap;
+  overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch; padding-right: 40px;
 }
 .shelf-books::-webkit-scrollbar { display: none; }
 
@@ -189,6 +190,7 @@ body {
   position: relative;
   box-shadow: 5px 5px 12px rgba(0,0,0,0.35), 2px 0 4px rgba(0,0,0,0.2), -1px 0 1px rgba(255,255,255,0.05);
   overflow: hidden;
+  flex-shrink: 0; cursor: pointer;
 }
 .book-cover::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 14px;
@@ -421,13 +423,14 @@ body {
 }
 .pdf-open-btn:hover { color: var(--gold); }
 .pdf-iframe {
-  width: 100%; height: 70vh; border: none; display: block;
+  width: 100%; height: 200vh; border: none; display: block;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .main-content { grid-template-columns: 1fr; overflow: hidden; }
-  .sidebar, .bookshelf-area { min-width: 0; max-width: 100%; }
+  .main-content { grid-template-columns: 1fr; }
+  .sidebar { min-width: 0; max-width: 100%; }
+  .bookshelf-area { min-width: 0; max-width: 100%; }
   .sidebar {
     border-right: none; border-bottom: 1px solid rgba(139,90,43,0.1);
     padding: 16px 20px;
