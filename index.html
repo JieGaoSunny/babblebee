@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>BabbleBee 古文磨耳朵</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 </head>
 <body>
-<div id="app">
+<div class="app" id="app">
 
   <!-- ===== HOME PAGE ===== -->
   <main id="page-home" class="page active">
@@ -41,12 +42,8 @@
       <div class="mini-artist" id="player-count"></div>
     </div>
     <div class="mini-controls">
-      <button onclick="playerToggle()" id="btn-play" class="mini-btn">
-        <svg class="icon" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-      </button>
-      <button onclick="playerNext()" class="mini-btn">
-        <svg class="icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
-      </button>
+      <button onclick="playerToggle()" id="btn-play" class="mini-btn"><i class="ri-play-fill"></i></button>
+      <button onclick="playerNext()" class="mini-btn"><i class="ri-skip-forward-fill"></i></button>
     </div>
     <div class="mini-progress">
       <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
@@ -57,9 +54,7 @@
   <div id="vinyl-player" class="vinyl-player hidden">
     <div class="vinyl-bg" id="vinyl-bg"></div>
     <div class="vinyl-header">
-      <button class="vinyl-close" onclick="closeVinyl()">
-        <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
+      <button class="vinyl-close" onclick="closeVinyl()"><i class="ri-arrow-down-s-line" style="font-size:24px"></i></button>
       <div class="vinyl-header-info">
         <div class="vinyl-book-title" id="vinyl-book-title"></div>
         <div class="vinyl-book-sub" id="vinyl-book-sub"></div>
@@ -87,21 +82,11 @@
       <span id="vinyl-time-dur">0:00</span>
     </div>
     <div class="vinyl-controls">
-      <button onclick="toggleLoop()" id="vinyl-btn-loop" class="vinyl-ctrl" title="循环模式">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-      </button>
-      <button onclick="playerPrev()" class="vinyl-ctrl">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
-      </button>
-      <button onclick="playerToggle()" id="vinyl-btn-play" class="vinyl-ctrl vinyl-ctrl-play">
-        <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-      </button>
-      <button onclick="playerNext()" class="vinyl-ctrl">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
-      </button>
-      <button class="vinyl-ctrl" onclick="showTrackList()" title="播放列表">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      </button>
+      <button onclick="toggleLoop()" id="vinyl-btn-loop" class="vinyl-ctrl" title="循环模式"><i class="ri-repeat-one-line"></i></button>
+      <button onclick="playerPrev()" class="vinyl-ctrl"><i class="ri-skip-back-fill"></i></button>
+      <button onclick="playerToggle()" id="vinyl-btn-play" class="vinyl-ctrl vinyl-ctrl-play"><i class="ri-play-fill"></i></button>
+      <button onclick="playerNext()" class="vinyl-ctrl"><i class="ri-skip-forward-fill"></i></button>
+      <button class="vinyl-ctrl" onclick="showTrackList()" title="播放列表"><i class="ri-list-unordered"></i></button>
     </div>
   </div>
 

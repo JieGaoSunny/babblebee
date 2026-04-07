@@ -1,30 +1,12 @@
-/* BabbleBee 🐝 — Minimal Slate Design */
+/* BabbleBee 古文磨耳朵 — Classical Parchment Style */
 
 const AUDIO_BASE = 'https://jiettsstorage.blob.core.windows.net/babblebee/audio/';
 const TEXT_BASE = 'https://jiettsstorage.blob.core.windows.net/babblebee/texts/';
 
-// SVG icon helpers (Lucide-style)
-const SVG = {
-  play: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
-  pause: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
-  playLg: '<svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
-  pauseLg: '<svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
-  skipFwd: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>',
-  skipBack: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>',
-  repeat: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
-  repeat1: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><text x="12" y="15" font-size="8" fill="currentColor" stroke="none" text-anchor="middle">1</text></svg>',
-  list: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
-  arrowLeft: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
-  playCircle: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
-  fileText: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
-  headphones: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
-  chevronRight: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
-};
-
 let books = [];
 let currentBook = null;
 let currentTrackIdx = 0;
-let loopMode = 'single'; // single | list
+let loopMode = 'single';
 let activeTab = '全部';
 let vinylOpen = false;
 const audio = document.getElementById('audio');
@@ -39,18 +21,18 @@ function getCoverChar(title) {
 const BANNER_BG = ['bg-1','bg-2','bg-3','bg-4','bg-5','bg-6'];
 
 const VINYL_BG_COLORS = [
-  'linear-gradient(135deg, #171C26, #2D3748)',
-  'linear-gradient(135deg, #1A2634, #3D4F5F)',
-  'linear-gradient(135deg, #1E272E, #485460)',
-  'linear-gradient(135deg, #2C3E50, #4A6274)',
-  'linear-gradient(135deg, #1C2833, #34495E)',
-  'linear-gradient(135deg, #283747, #5D6D7E)',
-  'linear-gradient(135deg, #1A202C, #4A5568)',
-  'linear-gradient(135deg, #2D3748, #718096)',
-  'linear-gradient(135deg, #171C26, #4A5568)',
-  'linear-gradient(135deg, #1A2634, #576574)',
-  'linear-gradient(135deg, #2C3A47, #6C7689)',
-  'linear-gradient(135deg, #1E272E, #515A5A)',
+  'linear-gradient(135deg, #2C1810, #1a0f0a)',
+  'linear-gradient(135deg, #654321, #3E2723)',
+  'linear-gradient(135deg, #8B0000, #3d0000)',
+  'linear-gradient(135deg, #1a1a2e, #0d0d1a)',
+  'linear-gradient(135deg, #1b4332, #0a2e10)',
+  'linear-gradient(135deg, #3c1518, #1a0a0c)',
+  'linear-gradient(135deg, #4A3728, #2C1810)',
+  'linear-gradient(135deg, #5f0f40, #3d0525)',
+  'linear-gradient(135deg, #8B5A2B, #4A3728)',
+  'linear-gradient(135deg, #3d405b, #1d1f2e)',
+  'linear-gradient(135deg, #6b2737, #3a1520)',
+  'linear-gradient(135deg, #0b3954, #051c2c)',
 ];
 
 // --- Storage ---
@@ -105,7 +87,7 @@ function renderBookList() {
   document.getElementById('book-list').innerHTML = filtered.map(b => {
     const gi = books.indexOf(b);
     const total = getBookTotalPlays(b);
-    const badge = total > 0 ? `<span class="book-play-badge">${SVG.headphones} ${total}</span>` : '';
+    const badge = total > 0 ? `<span class="book-play-badge"><i class="ri-headphone-fill" style="font-size:10px"></i> ${total}</span>` : '';
     return `
       <div class="book-row" onclick="location.hash='book/${b.id}'">
         <div class="book-cover-sm ${getCoverClass(gi)}">
@@ -119,7 +101,7 @@ function renderBookList() {
             ${badge}
           </div>
         </div>
-        <span class="book-row-arrow">${SVG.chevronRight}</span>
+        <i class="ri-arrow-right-s-line book-row-arrow"></i>
       </div>`;
   }).join('');
 }
@@ -134,8 +116,8 @@ function showBook(book) {
   const total = getBookTotalPlays(book);
 
   document.getElementById('detail-header').innerHTML = `
-    <button class="detail-back" onclick="goHome()">${SVG.arrowLeft} 返回</button>
-    <div class="detail-cover-wrap">
+    <button class="detail-back" onclick="goHome()"><i class="ri-arrow-left-s-line"></i> 返回</button>
+    <div class="book-hero">
       <div class="detail-cover ${getCoverClass(gi)}">
         <span class="cover-char">${getCoverChar(book.title)}</span>
       </div>
@@ -143,33 +125,39 @@ function showBook(book) {
         <div class="detail-title">${book.title}</div>
         <div class="detail-desc">${book.desc}</div>
         <div class="detail-stats">
-          <span>${SVG.fileText} ${book.tracks.length}篇</span>
-          <span>${SVG.headphones} ${total}次</span>
+          <div><div class="detail-stat-value">${book.tracks.length}</div><div class="detail-stat-label">篇章</div></div>
+          <div><div class="detail-stat-value">${total}</div><div class="detail-stat-label">已听</div></div>
         </div>
       </div>
     </div>`;
 
   document.getElementById('detail-actions').innerHTML = `
-    <button class="action-btn action-btn-primary" onclick="playTrack(0)">${SVG.playCircle} 全部播放</button>
-    ${book.pdf ? `<button class="action-btn action-btn-ghost" onclick="togglePdf()">${SVG.fileText} 原文</button>` : ''}
+    <button class="action-btn action-btn-primary" onclick="playTrack(0)">
+      <i class="ri-play-circle-fill"></i>
+      <span>全部播放</span>
+    </button>
+    ${book.pdf ? `<button class="action-btn action-btn-ghost" onclick="togglePdf()"><i class="ri-book-open-line"></i> 查看原文</button>` : ''}
   `;
 
-  const loopIcon = loopMode === 'single' ? SVG.repeat1 : SVG.repeat;
+  const loopIcon = loopMode === 'single' ? 'ri-repeat-one-line' : 'ri-repeat-line';
   document.getElementById('detail-tracks').innerHTML = `
-    <div class="track-header">
-      <span>共 ${book.tracks.length} 首</span>
-      <button onclick="toggleLoop()" id="btn-loop" style="background:none;border:none;cursor:pointer;display:flex;align-items:center">${loopIcon}</button>
-    </div>
-    <ul class="track-list">${
+    <div class="chapters">
+      <div class="track-header">
+        <span>全部篇章</span>
+        <span>共 ${book.tracks.length} 首</span>
+      </div>
+      <ul class="track-list">${
     book.tracks.map((t, i) => {
       const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
       const plays = getPlayCount(t);
       const badge = plays > 0 ? `<span class="track-plays">×${plays}</span>` : '';
       return `<li class="track-item" data-idx="${i}" onclick="playTrack(${i})">
-        <span class="track-num">${i + 1}</span>
-        <span class="track-name">${name}</span>${badge}</li>`;
+        <span class="track-num">${String(i + 1).padStart(2, '0')}</span>
+        <span class="track-name">${name}</span>${badge}
+        <i class="ri-play-fill track-icon"></i></li>`;
     }).join('')
-  }</ul>`;
+  }</ul>
+    </div>`;
 
   document.getElementById('book-pdf').innerHTML = book.pdf
     ? `<div id="pdf-container" style="display:none"><iframe src="${TEXT_BASE}${encodeURIComponent(book.pdf)}"></iframe></div>`
@@ -207,9 +195,18 @@ function playTrack(idx) {
   mc.className = 'mini-cover ' + getCoverClass(gi);
   mc.textContent = getCoverChar(currentBook.title);
   
-  document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing'));
+  document.querySelectorAll('.track-item').forEach(el => {
+    el.classList.remove('playing');
+    const icon = el.querySelector('.track-icon');
+    if (icon) icon.className = 'ri-play-fill track-icon';
+  });
   const item = document.querySelector(`.track-item[data-idx="${idx}"]`);
-  if (item) { item.classList.add('playing'); item.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  if (item) {
+    item.classList.add('playing');
+    const icon = item.querySelector('.track-icon');
+    if (icon) icon.className = 'ri-volume-up-fill track-icon';
+    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
   
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({ title: name, artist: 'BabbleBee 古文磨耳朵', album: currentBook.title });
@@ -226,11 +223,9 @@ function playerNext() { if (currentBook) playTrack((currentTrackIdx + 1) % curre
 
 function toggleLoop() {
   loopMode = loopMode === 'single' ? 'list' : 'single';
-  const icon = loopMode === 'single' ? SVG.repeat1 : SVG.repeat;
-  const btn = document.getElementById('btn-loop');
-  if (btn) btn.innerHTML = icon;
+  const cls = loopMode === 'single' ? 'ri-repeat-one-line' : 'ri-repeat-line';
   const vb = document.getElementById('vinyl-btn-loop');
-  if (vb) vb.innerHTML = icon;
+  if (vb) vb.innerHTML = `<i class="${cls}"></i>`;
 }
 
 function updatePlayerCount() {
@@ -311,9 +306,9 @@ document.getElementById('vinyl-progress-bar').addEventListener('input', e => {
 
 function syncPlayState() {
   const playing = !audio.paused;
-  document.getElementById('btn-play').innerHTML = playing ? SVG.pause : SVG.play;
+  document.getElementById('btn-play').innerHTML = playing ? '<i class="ri-pause-fill"></i>' : '<i class="ri-play-fill"></i>';
   const vb = document.getElementById('vinyl-btn-play');
-  if (vb) vb.innerHTML = playing ? SVG.pauseLg : SVG.playLg;
+  if (vb) vb.innerHTML = playing ? '<i class="ri-pause-fill" style="font-size:28px"></i>' : '<i class="ri-play-fill" style="font-size:28px"></i>';
   updateVinylDisc();
 }
 audio.addEventListener('play', syncPlayState);
