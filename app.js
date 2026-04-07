@@ -6,11 +6,10 @@ const TEXT_BASE = 'https://jiettsstorage.blob.core.windows.net/babblebee/texts/'
 let books = [];
 let currentBook = null;
 let currentTrackIdx = 0;
-let loopMode = 'single';
+let loopMode = 'single'; // single | list
 let vinylOpen = false;
 const audio = document.getElementById('audio');
 
-// Book color classes for shelf display
 const BOOK_COLORS = ['book-red','book-blue','book-green','book-brown','book-purple','book-black','book-teal','book-orange','book-navy','book-wine','book-forest','book-slate'];
 function getBookColor(idx) { return BOOK_COLORS[idx % BOOK_COLORS.length]; }
 function getCoverChar(title) {
@@ -38,10 +37,22 @@ function getPlayCount(t) { return parseInt(localStorage.getItem('pc:' + t) || '0
 function incPlayCount(t) { const c = getPlayCount(t) + 1; localStorage.setItem('pc:' + t, c); return c; }
 function getBookTotalPlays(b) { return b.tracks.reduce((s, t) => s + getPlayCount(t), 0); }
 
+function saveLastPlayed() {
+  if (!currentBook) return;
+  localStorage.setItem('lastBook', currentBook.id);
+  localStorage.setItem('lastTrack', String(currentTrackIdx));
+}
+function getLastPlayed() {
+  const bid = localStorage.getItem('lastBook');
+  const tidx = parseInt(localStorage.getItem('lastTrack') || '0');
+  return { bookId: bid, trackIdx: tidx };
+}
+
 // --- Init ---
 async function init() {
   books = await (await fetch('books.json')).json();
   renderBookshelf();
+  renderContinueCard();
   window.addEventListener('hashchange', handleHash);
   handleHash();
 }
@@ -54,7 +65,7 @@ function handleHash() {
   } else goHome();
 }
 
-// --- Bookshelf (grouped by category) ---
+// --- Bookshelf ---
 function renderBookshelf() {
   const catOrder = [];
   const catMap = {};
@@ -63,45 +74,58 @@ function renderBookshelf() {
     catMap[b.category].push({ book: b, globalIdx: i });
   });
 
-  const area = document.getElementById('bookshelf-area');
-  area.innerHTML = catOrder.map(cat => `
+  document.getElementById('bookshelf-area').innerHTML = catOrder.map(cat => `
     <div class="shelf">
       <div class="shelf-label">${cat}</div>
       <div class="shelf-books">
         ${catMap[cat].map(({ book: b, globalIdx: gi }) => `
           <a class="book" onclick="location.hash='book/${b.id}';return false;" href="#">
-            <div class="book-cover ${getBookColor(gi)}">
-              <h3>${getCoverChar(b.title)}</h3>
-            </div>
+            <div class="book-cover ${getBookColor(gi)}"><h3>${getCoverChar(b.title)}</h3></div>
           </a>
         `).join('')}
       </div>
       <div class="shelf-board"></div>
     </div>
   `).join('');
-
-  updateContinueCard();
 }
 
-// --- Continue Listening sidebar ---
-function updateContinueCard() {
+// --- Continue Listening Card ---
+function renderContinueCard() {
   const card = document.getElementById('continue-card');
-  if (!currentBook) { card.classList.add('sidebar-hidden'); return; }
-  card.classList.remove('sidebar-hidden');
-  const gi = books.indexOf(currentBook);
-  const t = currentBook.tracks[currentTrackIdx];
-  const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
-  
-  const cover = document.getElementById('continue-cover');
-  cover.className = 'continue-cover ' + getBookColor(gi);
-  cover.innerHTML = `<h3>${getCoverChar(currentBook.title)}</h3>`;
-  
-  document.getElementById('continue-title').textContent = name;
-  document.getElementById('continue-sub').textContent = currentBook.title;
-}
+  const { bookId, trackIdx } = getLastPlayed();
+  const book = bookId ? books.find(b => b.id === bookId) : null;
 
-function resumePlay() {
-  if (currentBook) { audio.paused ? audio.play() : playTrack(currentTrackIdx); }
+  if (!book) {
+    card.innerHTML = `
+      <div class="continue-empty">
+        <i class="ri-headphone-line" style="font-size:36px;color:var(--wood-light);"></i>
+        <div class="continue-label">选一本书开始磨耳朵</div>
+      </div>`;
+    card.onclick = null;
+    return;
+  }
+
+  const gi = books.indexOf(book);
+  const t = book.tracks[trackIdx] || book.tracks[0];
+  const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
+  const plays = getBookTotalPlays(book);
+
+  card.innerHTML = `
+    <div class="continue-cover ${getBookColor(gi)}">
+      <h3>${getCoverChar(book.title)}</h3>
+    </div>
+    <div class="continue-info">
+      <div class="continue-label">继续收听</div>
+      <div class="continue-title">${name}</div>
+      <div class="continue-sub">${book.title}${plays > 0 ? ' · 已听' + plays + '遍' : ''}</div>
+    </div>
+    <div class="continue-play"><i class="ri-play-fill"></i></div>`;
+  card.onclick = () => {
+    currentBook = book;
+    currentTrackIdx = trackIdx;
+    location.hash = 'book/' + book.id;
+    setTimeout(() => playTrack(trackIdx), 300);
+  };
 }
 
 // --- Book Detail ---
@@ -114,7 +138,7 @@ function showBook(book) {
   const total = getBookTotalPlays(book);
 
   document.getElementById('detail-header').innerHTML = `
-    <button class="detail-back" onclick="goHome()"><i class="ri-arrow-left-s-line"></i> 返回</button>
+    <button class="detail-back" onclick="goHome()"><i class="ri-arrow-left-s-line"></i> 返回书架</button>
     <div class="book-hero">
       <div class="detail-cover ${getBookColor(gi)}">
         <span class="cover-char">${getCoverChar(book.title)}</span>
@@ -164,7 +188,7 @@ function goHome() {
   location.hash = '';
   document.getElementById('page-book').classList.remove('active');
   document.getElementById('page-home').classList.add('active');
-  updateContinueCard();
+  renderContinueCard();
 }
 
 // --- Player ---
@@ -174,10 +198,12 @@ function playTrack(idx) {
   const t = currentBook.tracks[idx];
   audio.src = AUDIO_BASE + encodeURIComponent(t);
   audio.play();
+  saveLastPlayed();
   
   const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
   document.getElementById('player-bar').classList.remove('hidden');
   document.getElementById('player-title').textContent = name;
+  document.getElementById('player-book').textContent = currentBook.title;
   updatePlayerCount();
   
   const gi = books.indexOf(currentBook);
@@ -185,7 +211,7 @@ function playTrack(idx) {
   mc.className = 'mini-cover ' + getBookColor(gi);
   mc.textContent = getCoverChar(currentBook.title);
   
-  // Highlight track
+  // Highlight
   document.querySelectorAll('.track-item').forEach(el => {
     el.classList.remove('playing');
     const icon = el.querySelector('.track-icon');
@@ -198,8 +224,6 @@ function playTrack(idx) {
     if (icon) icon.className = 'ri-volume-up-fill track-icon';
     item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  
-  updateContinueCard();
   
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({ title: name, artist: 'BabbleBee 古文磨耳朵', album: currentBook.title });
@@ -215,21 +239,23 @@ function playerNext() { if (currentBook) playTrack((currentTrackIdx + 1) % curre
 
 function toggleLoop() {
   loopMode = loopMode === 'single' ? 'list' : 'single';
-  const cls = loopMode === 'single' ? 'ri-repeat-one-line' : 'ri-repeat-line';
   const vb = document.getElementById('vinyl-btn-loop');
-  if (vb) vb.innerHTML = `<i class="${cls}"></i>`;
+  if (vb) vb.innerHTML = `<i class="${loopMode === 'single' ? 'ri-repeat-one-line' : 'ri-repeat-line'}"></i>`;
+  const mb = document.getElementById('mini-btn-loop');
+  if (mb) mb.innerHTML = `<i class="${loopMode === 'single' ? 'ri-repeat-one-line' : 'ri-repeat-line'}"></i>`;
 }
 
 function updatePlayerCount() {
   if (!currentBook) return;
   const c = getPlayCount(currentBook.tracks[currentTrackIdx]);
-  document.getElementById('player-count').textContent = c > 0 ? `已听${c}遍` : currentBook.title;
+  document.getElementById('player-count').textContent = c > 0 ? `已听${c}遍` : '';
 }
 
 audio.addEventListener('ended', () => {
   const t = currentBook.tracks[currentTrackIdx];
   incPlayCount(t);
   updatePlayerCount();
+  saveLastPlayed();
   const items = document.querySelectorAll('.track-item');
   if (items[currentTrackIdx]) {
     let badge = items[currentTrackIdx].querySelector('.track-plays');
