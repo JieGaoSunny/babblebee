@@ -411,4 +411,19 @@ audio.addEventListener('pause', syncPlayState);
   full.addEventListener('touchend', () => { dragging = false; });
 })();
 
+// --- Full player button bindings (touchend for mobile reliability) ---
+function bindTap(id, fn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', fn);
+  el.addEventListener('touchend', e => { e.preventDefault(); fn(); });
+}
+bindTap('full-btn-loop', toggleLoop);
+bindTap('full-btn-seek-back', () => playerSeek(-15));
+bindTap('full-btn-prev', playerPrev);
+bindTap('btn-play-full', playerToggle);
+bindTap('full-btn-next', playerNext);
+bindTap('full-btn-seek-fwd', () => playerSeek(30));
+bindTap('full-btn-speed', toggleSpeed);
+
 init();
