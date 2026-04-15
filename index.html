@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>BabbleBee 古文磨耳朵</title>
-<link rel="stylesheet" href="style.css?v=20260407g">
+<link rel="stylesheet" href="style.css?v=20260415">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&display=swap">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -41,32 +41,54 @@
     <div class="spacer"></div>
   </main>
 
-  <!-- ===== MINI PLAYER BAR ===== -->
+  <!-- ===== MINI FAB (collapsed) ===== -->
+  <button id="player-fab" class="player-fab hidden" onclick="playerExpandBar()">
+    <i class="ri-music-2-fill"></i>
+  </button>
+
+  <!-- ===== BAR PLAYER ===== -->
   <div id="player-bar" class="player-bar hidden">
-    <div class="mini-progress">
+    <div class="bar-progress">
       <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
     </div>
-    <div class="mini-cover" id="mini-cover"></div>
-    <div class="mini-info">
-      <div class="mini-title" id="player-title">未播放</div>
-      <div class="mini-sub">
-        <span id="player-book"></span>
-        <span id="player-count"></span>
-      </div>
+    <div class="bar-cover" id="bar-cover" onclick="playerExpandFull()"></div>
+    <div class="bar-info" onclick="playerExpandFull()">
+      <div class="bar-title" id="player-title">未播放</div>
+      <div class="bar-sub"><span id="player-book"></span></div>
     </div>
-    <div class="mini-controls">
-      <button onclick="playerPrev()" class="mini-btn" title="上一首"><i class="ri-skip-back-fill"></i></button>
-      <button onclick="playerToggle()" id="btn-play" class="mini-btn mini-btn-play">
-        <svg class="progress-ring" viewBox="0 0 40 40"><circle class="ring-bg" cx="20" cy="20" r="17"/><circle class="ring-fg" id="progress-ring-fg" cx="20" cy="20" r="17" stroke-dasharray="106.8" stroke-dashoffset="106.8"/></svg>
-        <i class="ri-play-fill"></i>
-      </button>
-      <button onclick="playerNext()" class="mini-btn" title="下一首"><i class="ri-skip-forward-fill"></i></button>
-      <button onclick="toggleLoop()" id="mini-btn-loop" class="mini-btn mini-btn-sm" title="循环模式"><i class="ri-repeat-one-line"></i></button>
+    <div class="bar-controls">
+      <button onclick="playerPrev()" class="bar-btn" title="上一首"><i class="ri-skip-back-fill"></i></button>
+      <button onclick="playerToggle()" id="btn-play" class="bar-btn bar-btn-play"><i class="ri-play-fill"></i></button>
+      <button onclick="playerNext()" class="bar-btn" title="下一首"><i class="ri-skip-forward-fill"></i></button>
+      <button onclick="playerCollapse()" class="bar-btn bar-btn-collapse" title="收起"><i class="ri-arrow-down-s-line"></i></button>
+    </div>
+  </div>
+
+  <!-- ===== FULL SCREEN PLAYER ===== -->
+  <div id="player-full" class="player-full hidden">
+    <div class="full-handle" onclick="playerCollapseFull()"><div class="full-handle-bar"></div></div>
+    <div class="full-cover" id="full-cover"></div>
+    <div class="full-title" id="full-title"></div>
+    <div class="full-book" id="full-book"></div>
+    <div class="full-count" id="full-count"></div>
+    <div class="full-progress">
+      <span class="full-time" id="full-time-cur">0:00</span>
+      <input type="range" id="full-progress-bar" min="0" max="100" value="0" step="0.1">
+      <span class="full-time" id="full-time-dur">0:00</span>
+    </div>
+    <div class="full-controls">
+      <button onclick="toggleLoop()" id="full-btn-loop" class="full-btn full-btn-sm" title="循环模式"><i class="ri-repeat-one-line"></i><span class="full-btn-label" id="full-loop-label">单曲</span></button>
+      <button onclick="playerSeek(-15)" class="full-btn" title="回退15秒"><i class="ri-replay-15-fill"></i></button>
+      <button onclick="playerPrev()" class="full-btn" title="上一首"><i class="ri-skip-back-fill"></i></button>
+      <button onclick="playerToggle()" id="btn-play-full" class="full-btn full-btn-play"><i class="ri-play-fill"></i></button>
+      <button onclick="playerNext()" class="full-btn" title="下一首"><i class="ri-skip-forward-fill"></i></button>
+      <button onclick="playerSeek(30)" class="full-btn" title="快进30秒"><i class="ri-forward-30-fill"></i></button>
+      <button onclick="toggleSpeed()" id="full-btn-speed" class="full-btn full-btn-sm" title="倍速"><span class="speed-label">1.0x</span></button>
     </div>
   </div>
 
 </div>
 <audio id="audio" preload="auto"></audio>
-<script src="app.js?v=20260407b"></script>
+<script src="app.js?v=20260415"></script>
 </body>
 </html>

@@ -22,6 +22,7 @@ function getCoverChar(title) {
     'Andersen 安徒生童话':'安徒生', 'An Ant 蚂蚁与鸽子':'蚂蚁鸽子',
     "Aesop's Fables":'伊索寓言', 'Peter Rabbit 彼得兔':'彼得兔',
     'Nursery Rhymes 英文儿歌':'英文儿歌',
+    'Power Up':'PU',
   };
   if (map[title]) return map[title];
   const c = title.replace(/[·「」《》（）\-\s]/g, '');
@@ -201,6 +202,10 @@ function goHome() {
 }
 
 // --- Player ---
+let playerState = 'hidden'; // hidden | bar | mini | full
+let playbackSpeed = 1.0;
+const SPEEDS = [0.75, 1.0, 1.25, 1.5, 2.0];
+
 function playTrack(idx) {
   if (!currentBook) return;
   currentTrackIdx = idx;
@@ -210,15 +215,27 @@ function playTrack(idx) {
   saveLastPlayed();
 
   const name = t.replace(/\.mp3$/i, '').replace(/^\d+-/, '');
-  document.getElementById('player-bar').classList.remove('hidden');
+
+  // Show bar player
+  playerShowBar();
+
+  // Update bar info
   document.getElementById('player-title').textContent = name;
   document.getElementById('player-book').textContent = currentBook.title;
-  updatePlayerCount();
 
+  // Update bar cover
   const gi = books.indexOf(currentBook);
-  const mc = document.getElementById('mini-cover');
-  mc.className = 'mini-cover ' + getBookColor(gi);
-  mc.textContent = getCoverChar(currentBook.title);
+  const bc = document.getElementById('bar-cover');
+  bc.className = 'bar-cover ' + getBookColor(gi);
+  bc.textContent = getCoverChar(currentBook.title);
+
+  // Update full player
+  const fc = document.getElementById('full-cover');
+  fc.className = 'full-cover ' + getBookColor(gi);
+  fc.innerHTML = `<h3>${getCoverChar(currentBook.title)}</h3>`;
+  document.getElementById('full-title').textContent = name;
+  document.getElementById('full-book').textContent = currentBook.title;
+  updatePlayerCount();
 
   // Highlight track
   document.querySelectorAll('.track-item').forEach(el => {
@@ -241,9 +258,50 @@ function playTrack(idx) {
   }
 }
 
+// --- Player state transitions ---
+function playerShowBar() {
+  document.getElementById('player-bar').classList.remove('hidden');
+  document.getElementById('player-fab').classList.add('hidden');
+  document.getElementById('player-full').classList.add('hidden');
+  playerState = 'bar';
+}
+function playerCollapse() {
+  document.getElementById('player-bar').classList.add('hidden');
+  document.getElementById('player-fab').classList.remove('hidden');
+  document.getElementById('player-full').classList.add('hidden');
+  playerState = 'mini';
+}
+function playerExpandBar() {
+  playerShowBar();
+}
+function playerExpandFull() {
+  document.getElementById('player-full').classList.remove('hidden');
+  document.getElementById('player-bar').classList.add('hidden');
+  document.getElementById('player-fab').classList.add('hidden');
+  playerState = 'full';
+  updateFullProgress();
+}
+function playerCollapseFull() {
+  document.getElementById('player-full').classList.add('hidden');
+  playerShowBar();
+}
+
 function playerToggle() { audio.paused ? audio.play() : audio.pause(); }
 function playerPrev() { if (currentBook) playTrack((currentTrackIdx - 1 + currentBook.tracks.length) % currentBook.tracks.length); }
 function playerNext() { if (currentBook) playTrack((currentTrackIdx + 1) % currentBook.tracks.length); }
+
+function playerSeek(delta) {
+  if (audio.duration) {
+    audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + delta));
+  }
+}
+
+function toggleSpeed() {
+  const ci = SPEEDS.indexOf(playbackSpeed);
+  playbackSpeed = SPEEDS[(ci + 1) % SPEEDS.length];
+  audio.playbackRate = playbackSpeed;
+  document.getElementById('full-btn-speed').querySelector('.speed-label').textContent = playbackSpeed + 'x';
+}
 
 function toggleLoop() {
   const modes = ['chapter', 'single', 'list'];
@@ -251,17 +309,19 @@ function toggleLoop() {
   const icons = { chapter: 'ri-play-line', single: 'ri-repeat-one-line', list: 'ri-repeat-line' };
   const ci = modes.indexOf(loopMode);
   loopMode = modes[(ci + 1) % modes.length];
-  const mb = document.getElementById('mini-btn-loop');
-  if (mb) {
-    mb.innerHTML = `<i class="${icons[loopMode]}"></i>`;
-    mb.title = labels[loopMode];
+  // Update full player loop button
+  const fb = document.getElementById('full-btn-loop');
+  if (fb) {
+    fb.querySelector('i').className = icons[loopMode];
+    document.getElementById('full-loop-label').textContent = labels[loopMode];
   }
 }
 
 function updatePlayerCount() {
   if (!currentBook) return;
   const c = getPlayCount(currentBook.tracks[currentTrackIdx]);
-  document.getElementById('player-count').textContent = c > 0 ? `已听${c}遍` : '';
+  const el = document.getElementById('full-count');
+  if (el) el.textContent = c > 0 ? `已听${c}遍` : '';
 }
 
 audio.addEventListener('ended', () => {
@@ -276,7 +336,6 @@ audio.addEventListener('ended', () => {
     badge.textContent = `×${getPlayCount(t)}`;
   }
   if (loopMode === 'chapter') {
-    // Play once, stop
     audio.pause();
     syncPlayState();
   } else if (loopMode === 'single') {
@@ -292,24 +351,51 @@ function fmtTime(s) {
   return Math.floor(s / 60) + ':' + (Math.floor(s % 60) < 10 ? '0' : '') + Math.floor(s % 60);
 }
 
+function updateFullProgress() {
+  if (!audio.duration) return;
+  document.getElementById('full-time-cur').textContent = fmtTime(audio.currentTime);
+  document.getElementById('full-time-dur').textContent = fmtTime(audio.duration);
+  document.getElementById('full-progress-bar').value = (audio.currentTime / audio.duration) * 100;
+}
+
 audio.addEventListener('timeupdate', () => {
   if (audio.duration) {
     const pct = audio.currentTime / audio.duration;
     document.getElementById('progress-bar').value = pct * 100;
-    const ring = document.getElementById('progress-ring-fg');
-    if (ring) { const c = 106.8; ring.style.strokeDashoffset = c - (c * pct); }
+    if (playerState === 'full') updateFullProgress();
   }
 });
 
 document.getElementById('progress-bar').addEventListener('input', e => {
   if (audio.duration) audio.currentTime = (e.target.value / 100) * audio.duration;
 });
+document.getElementById('full-progress-bar').addEventListener('input', e => {
+  if (audio.duration) audio.currentTime = (e.target.value / 100) * audio.duration;
+});
 
 function syncPlayState() {
   const playing = !audio.paused;
-  document.getElementById('btn-play').innerHTML = playing ? '<i class="ri-pause-fill"></i>' : '<i class="ri-play-fill"></i>';
+  const icon = playing ? '<i class="ri-pause-fill"></i>' : '<i class="ri-play-fill"></i>';
+  document.getElementById('btn-play').innerHTML = icon;
+  document.getElementById('btn-play-full').innerHTML = icon;
+  // FAB animation
+  const fab = document.getElementById('player-fab');
+  if (playing) fab.classList.add('playing'); else fab.classList.remove('playing');
 }
 audio.addEventListener('play', syncPlayState);
 audio.addEventListener('pause', syncPlayState);
+
+// --- Swipe down to close full player ---
+(function() {
+  const full = document.getElementById('player-full');
+  let startY = 0, dragging = false;
+  full.addEventListener('touchstart', e => { startY = e.touches[0].clientY; dragging = true; });
+  full.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 80) { dragging = false; playerCollapseFull(); }
+  });
+  full.addEventListener('touchend', () => { dragging = false; });
+})();
 
 init();
