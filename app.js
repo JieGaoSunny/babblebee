@@ -389,7 +389,12 @@ audio.addEventListener('pause', syncPlayState);
 (function() {
   const full = document.getElementById('player-full');
   let startY = 0, dragging = false;
-  full.addEventListener('touchstart', e => { startY = e.touches[0].clientY; dragging = true; });
+  full.addEventListener('touchstart', e => {
+    // Don't intercept touches on interactive elements
+    const tag = e.target.closest('button, input, a');
+    if (tag) return;
+    startY = e.touches[0].clientY; dragging = true;
+  });
   full.addEventListener('touchmove', e => {
     if (!dragging) return;
     const dy = e.touches[0].clientY - startY;

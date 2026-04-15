@@ -490,6 +490,7 @@ body {
 .full-controls {
   display: flex; align-items: center; gap: 8px; margin-top: 12px;
   width: 100%; max-width: 400px; justify-content: center;
+  padding: 0 8px; box-sizing: border-box;
 }
 .full-btn {
   width: 48px; height: 48px; border-radius: 50%;
@@ -589,11 +590,12 @@ body {
   /* full player mobile */
   .full-cover { width: 160px; height: 220px; }
   .full-cover h3 { font-size: 22px; letter-spacing: 6px; }
-  .full-controls { gap: 4px; }
-  .full-btn { width: 42px; height: 42px; font-size: 20px; }
-  .full-btn-play { width: 56px; height: 56px; font-size: 28px; }
-  .full-btn-sm { width: 42px; height: 42px; font-size: 16px; }
+  .full-controls { gap: 2px; padding: 0 4px; }
+  .full-btn { width: 40px; height: 40px; font-size: 18px; }
+  .full-btn-play { width: 52px; height: 52px; font-size: 26px; }
+  .full-btn-sm { width: 40px; height: 40px; font-size: 15px; }
   .full-progress { max-width: 320px; }
+  .player-full { padding: 40px 16px; }
   /* detail page responsive */
   .book-hero { flex-direction: column; align-items: center; text-align: center; }
   .detail-cover { width: 100px; height: 140px; }
