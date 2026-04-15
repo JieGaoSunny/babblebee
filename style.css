@@ -409,7 +409,7 @@ body {
   transition: color 0.2s;
 }
 .bar-btn:active { color: var(--gold); }
-.bar-btn-play { font-size: 24px; background: rgba(255,255,255,0.1); }
+.bar-btn-play { font-size: 24px; background: rgba(255,255,255,0.1); padding-left: 2px; }
 .bar-btn-collapse { font-size: 18px; color: rgba(253,245,230,0.5); }
 
 /* ===== FULL SCREEN PLAYER ===== */
@@ -432,9 +432,9 @@ body {
 }
 .full-btn-back {
   width: 44px; height: 44px; border-radius: 50%;
-  border: none; background: none; cursor: pointer;
+  border: none; background: rgba(255,255,255,0.08); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  color: rgba(253,245,230,0.7); font-size: 24px;
+  color: var(--cream); font-size: 24px;
   transition: color 0.2s;
 }
 .full-btn-back:active { color: var(--gold); }
@@ -509,6 +509,7 @@ body {
   width: 64px; height: 64px; font-size: 32px;
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
   color: var(--ink); box-shadow: 0 4px 16px rgba(212,175,55,0.4);
+  padding-left: 3px; /* visually center the triangle */
 }
 .full-btn-play:active { transform: scale(0.95); }
 .full-btn-sm {
@@ -596,7 +597,7 @@ body {
   .full-cover h3 { font-size: 22px; letter-spacing: 6px; }
   .full-controls { gap: 2px; padding: 0 4px; }
   .full-btn { width: 40px; height: 40px; font-size: 18px; }
-  .full-btn-play { width: 52px; height: 52px; font-size: 26px; }
+  .full-btn-play { width: 52px; height: 52px; font-size: 26px; padding-left: 2px; }
   .full-btn-sm { width: 40px; height: 40px; font-size: 15px; }
   .full-progress { max-width: 320px; }
   .player-full { padding: 40px 16px; }
