@@ -61,12 +61,15 @@
       <button onclick="playerToggle()" id="btn-play" class="bar-btn bar-btn-play"><i class="ri-play-fill"></i></button>
       <button onclick="playerNext()" class="bar-btn" title="下一首"><i class="ri-skip-forward-fill"></i></button>
       <button onclick="playerCollapse()" class="bar-btn bar-btn-collapse" title="收起"><i class="ri-arrow-down-s-line"></i></button>
+      <button onclick="playerClose()" class="bar-btn bar-btn-collapse" title="关闭"><i class="ri-close-line"></i></button>
     </div>
   </div>
 
   <!-- ===== FULL SCREEN PLAYER ===== -->
   <div id="player-full" class="player-full hidden">
-    <div class="full-handle" onclick="playerCollapseFull()"><div class="full-handle-bar"></div></div>
+    <div class="full-top-bar">
+      <button onclick="playerCollapseFull()" class="full-btn-back"><i class="ri-arrow-down-s-line"></i></button>
+    </div>
     <div class="full-cover" id="full-cover"></div>
     <div class="full-title" id="full-title"></div>
     <div class="full-book" id="full-book"></div>

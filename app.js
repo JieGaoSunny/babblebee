@@ -271,6 +271,14 @@ function playerCollapse() {
   document.getElementById('player-full').classList.add('hidden');
   playerState = 'mini';
 }
+function playerClose() {
+  audio.pause();
+  audio.src = '';
+  document.getElementById('player-bar').classList.add('hidden');
+  document.getElementById('player-fab').classList.add('hidden');
+  document.getElementById('player-full').classList.add('hidden');
+  playerState = 'hidden';
+}
 function playerExpandBar() {
   playerShowBar();
 }
