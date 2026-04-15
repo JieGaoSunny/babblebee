@@ -1,35 +1,35 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>BabbleBee 古文磨耳朵</title>
-<link rel="stylesheet" href="style.css?v=20260407g">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&display=swap">
+<title>BabbleBee 巴波蜂 🐝</title>
+<link rel="stylesheet" href="style.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 </head>
 <body>
-<div class="app" id="app">
+<div id="app">
 
   <!-- ===== HOME PAGE ===== -->
   <main id="page-home" class="page active">
-    <header class="header">
-      <div class="header-left">
-        <img src="logo.png" alt="" class="topbar-logo" onclick="goHome()" style="cursor:pointer">
-        <h1>古文磨耳朵</h1>
-        <span class="header-en">BabbleBee</span>
-        <span class="header-slogan">日习一音，耳聪心明 — A buzz a day, wisdoms on the way.</span>
-      </div>
-    </header>
-    <div class="main-content">
-      <aside class="sidebar" id="sidebar">
-        <div class="continue-card" id="continue-card"></div>
-      </aside>
-      <div class="bookshelf-area" id="bookshelf-area"></div>
+    <!-- Top bar -->
+    <div class="topbar">
+      <img src="logo.png" alt="BabbleBee" class="topbar-logo">
+      <span class="topbar-title">巴波蜂</span>
+      <span class="topbar-sub">磨耳朵</span>
     </div>
-    <div class="spacer"></div>
+
+    <!-- Banner: featured carousel -->
+    <div class="banner-wrap">
+      <div class="banner-scroll" id="banner-scroll"></div>
+    </div>
+
+    <!-- Category tabs -->
+    <div id="tabs" class="tabs"></div>
+
+    <!-- Book list -->
+    <div id="book-list" class="book-list"></div>
   </main>
 
   <!-- ===== BOOK DETAIL PAGE ===== -->
@@ -38,35 +38,68 @@
     <div class="detail-actions" id="detail-actions"></div>
     <div class="detail-tracks" id="detail-tracks"></div>
     <div id="book-pdf"></div>
-    <div class="spacer"></div>
   </main>
 
   <!-- ===== MINI PLAYER BAR ===== -->
   <div id="player-bar" class="player-bar hidden">
+    <div class="mini-cover" id="mini-cover" onclick="openVinyl()"></div>
+    <div class="mini-info" onclick="openVinyl()">
+      <div class="mini-title" id="player-title">未播放</div>
+      <div class="mini-artist" id="player-count"></div>
+    </div>
+    <div class="mini-controls">
+      <button onclick="playerToggle()" id="btn-play" class="mini-btn">▶</button>
+      <button onclick="playerNext()" class="mini-btn">⏭</button>
+    </div>
     <div class="mini-progress">
       <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
     </div>
-    <div class="mini-cover" id="mini-cover"></div>
-    <div class="mini-info">
-      <div class="mini-title" id="player-title">未播放</div>
-      <div class="mini-sub">
-        <span id="player-book"></span>
-        <span id="player-count"></span>
+  </div>
+
+  <!-- ===== VINYL FULL PLAYER ===== -->
+  <div id="vinyl-player" class="vinyl-player hidden">
+    <div class="vinyl-bg" id="vinyl-bg"></div>
+    <div class="vinyl-header">
+      <button class="vinyl-close" onclick="closeVinyl()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="vinyl-header-info">
+        <div class="vinyl-book-title" id="vinyl-book-title"></div>
+        <div class="vinyl-book-sub" id="vinyl-book-sub"></div>
+      </div>
+      <span style="width:40px"></span>
+    </div>
+    <div class="vinyl-stage">
+      <div class="vinyl-arm-pivot">
+        <div class="vinyl-arm" id="vinyl-arm"></div>
+      </div>
+      <div class="vinyl-disc" id="vinyl-disc">
+        <div class="vinyl-groove"></div>
+        <div class="vinyl-groove g2"></div>
+        <div class="vinyl-groove g3"></div>
+        <div class="vinyl-center" id="vinyl-center"></div>
       </div>
     </div>
-    <div class="mini-controls">
-      <button onclick="playerPrev()" class="mini-btn" title="上一首"><i class="ri-skip-back-fill"></i></button>
-      <button onclick="playerToggle()" id="btn-play" class="mini-btn mini-btn-play">
-        <svg class="progress-ring" viewBox="0 0 40 40"><circle class="ring-bg" cx="20" cy="20" r="17"/><circle class="ring-fg" id="progress-ring-fg" cx="20" cy="20" r="17" stroke-dasharray="106.8" stroke-dashoffset="106.8"/></svg>
-        <i class="ri-play-fill"></i>
-      </button>
-      <button onclick="playerNext()" class="mini-btn" title="下一首"><i class="ri-skip-forward-fill"></i></button>
-      <button onclick="toggleLoop()" id="mini-btn-loop" class="mini-btn mini-btn-sm" title="循环模式"><i class="ri-repeat-one-line"></i></button>
+    <div class="vinyl-info">
+      <div class="vinyl-track-name" id="vinyl-track-name"></div>
+      <div class="vinyl-track-count" id="vinyl-track-count"></div>
+    </div>
+    <div class="vinyl-progress">
+      <span id="vinyl-time-cur">0:00</span>
+      <input type="range" id="vinyl-progress-bar" min="0" max="100" value="0" step="0.1">
+      <span id="vinyl-time-dur">0:00</span>
+    </div>
+    <div class="vinyl-controls">
+      <button onclick="toggleLoop()" id="vinyl-btn-loop" class="vinyl-ctrl" title="循环模式">🔂</button>
+      <button onclick="playerPrev()" class="vinyl-ctrl">⏮</button>
+      <button onclick="playerToggle()" id="vinyl-btn-play" class="vinyl-ctrl vinyl-ctrl-play">▶</button>
+      <button onclick="playerNext()" class="vinyl-ctrl">⏭</button>
+      <button class="vinyl-ctrl" onclick="showTrackList()" title="播放列表">☰</button>
     </div>
   </div>
 
 </div>
 <audio id="audio" preload="auto"></audio>
-<script src="app.js?v=20260407b"></script>
+<script src="app.js"></script>
 </body>
 </html>
