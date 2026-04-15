@@ -393,30 +393,20 @@ function syncPlayState() {
 audio.addEventListener('play', syncPlayState);
 audio.addEventListener('pause', syncPlayState);
 
-// --- Swipe down to close full player ---
-(function() {
-  const full = document.getElementById('player-full');
-  let startY = 0, dragging = false;
-  full.addEventListener('touchstart', e => {
-    // Don't intercept touches on interactive elements
-    const tag = e.target.closest('button, input, a');
-    if (tag) return;
-    startY = e.touches[0].clientY; dragging = true;
-  });
-  full.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    const dy = e.touches[0].clientY - startY;
-    if (dy > 80) { dragging = false; playerCollapseFull(); }
-  });
-  full.addEventListener('touchend', () => { dragging = false; });
-})();
+// Swipe down removed — use back button instead
 
 // --- Full player button bindings (touchend for mobile reliability) ---
 function bindTap(id, fn) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.addEventListener('click', fn);
-  el.addEventListener('touchend', e => { e.preventDefault(); fn(); });
+  let touched = false;
+  el.addEventListener('touchstart', () => { touched = true; }, {passive: true});
+  el.addEventListener('touchend', e => {
+    if (touched) { e.preventDefault(); fn(); touched = false; }
+  });
+  el.addEventListener('click', e => {
+    if (!touched) fn(); // only fire click if not already handled by touch
+  });
 }
 bindTap('full-btn-loop', toggleLoop);
 bindTap('full-btn-seek-back', () => playerSeek(-15));
@@ -425,5 +415,20 @@ bindTap('btn-play-full', playerToggle);
 bindTap('full-btn-next', playerNext);
 bindTap('full-btn-seek-fwd', () => playerSeek(30));
 bindTap('full-btn-speed', toggleSpeed);
+
+// --- Full progress bar touch handling ---
+(function() {
+  const bar = document.getElementById('full-progress-bar');
+  function seek(e) {
+    if (!audio.duration) return;
+    const rect = bar.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0] : e).clientX;
+    const pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+    audio.currentTime = pct * audio.duration;
+    bar.value = pct * 100;
+  }
+  bar.addEventListener('touchstart', seek, {passive: true});
+  bar.addEventListener('touchmove', e => { e.preventDefault(); seek(e); });
+})();
 
 init();
