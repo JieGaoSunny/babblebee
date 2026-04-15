@@ -423,6 +423,7 @@ body {
   padding: 40px 24px;
   color: var(--cream);
   animation: full-slide-up 0.3s ease;
+  overflow: hidden;
 }
 .player-full.hidden { display: none !important; }
 
@@ -480,6 +481,8 @@ body {
 #full-progress-bar {
   flex: 1; height: 6px; -webkit-appearance: none; appearance: none;
   background: rgba(255,255,255,0.15); border-radius: 3px; outline: none;
+  touch-action: none; /* critical for mobile drag */
+  padding: 12px 0; box-sizing: content-box; /* bigger touch area */
 }
 #full-progress-bar::-webkit-slider-thumb {
   -webkit-appearance: none; width: 16px; height: 16px;
@@ -503,6 +506,9 @@ body {
   flex-direction: column;
   color: var(--cream); font-size: 22px;
   transition: color 0.2s;
+  touch-action: manipulation; /* prevent double-tap zoom, allow clicks */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 .full-btn:active { color: var(--gold); }
 .full-btn-play {
@@ -516,6 +522,7 @@ body {
   width: 48px; height: 48px; font-size: 18px;
   color: rgba(253,245,230,0.6);
   flex-direction: column; gap: 2px;
+  touch-action: manipulation;
 }
 .full-btn-label { font-size: 10px; line-height: 1; }
 .speed-label { font-size: 14px; font-weight: 700; font-family: var(--serif); }
